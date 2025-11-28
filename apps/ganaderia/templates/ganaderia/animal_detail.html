@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-4">
+  <h3>Animal {{ animal.numero_arete }} - {{ animal.nombre }}</h3>
+  <p>Raza: {{ animal.raza }} | Sexo: {{ animal.get_sexo_display }} | Finca: {{ animal.finca.nombre }} | Estado: {{ animal.estado }}</p>
+  <p>Fecha nacimiento: {{ animal.fecha_nacimiento }} | Días: {{ animal.edad_dias }}</p>
+
+  <h5>Último pesaje</h5>
+  {% with pesaje=animal.latest_pesaje %}
+    {% if pesaje %}
+      <p>{{ pesaje.peso }} kg - {{ pesaje.fecha }}</p>
+    {% else %}
+      <p>No hay pesajes registrados</p>
+    {% endif %}
+  {% endwith %}
+
+  <h5>Partos</h5>
+  <ul>
+    {% for p in animal.partos.all %}
+      <li>{{ p.fecha_nacimiento }} - Cría: {{ p.cria }}</li>
+    {% empty %}
+      <li>No hay partos registrados</li>
+    {% endfor %}
+  </ul>
+</div>
+<a href="{% url 'ganaderia:animales_list' %}">Volver</a>
+{% endblock %}

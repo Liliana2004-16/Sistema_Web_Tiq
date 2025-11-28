@@ -1,0 +1,22 @@
+{% extends "base_public.html" %}
+{% block content %}
+<div style="max-width:420px;margin:60px auto">
+  <h2>Inicio de Sesión</h2>
+  <form method="post" novalidate>
+    {% csrf_token %}
+    {{ form.non_field_errors }}
+    <div>{{ form.username.label_tag }} {{ form.username }}</div>
+    <div>{{ form.password.label_tag }} {{ form.password }}</div>
+    <button type="submit">Ingresar</button>
+  </form>
+  <p> |
+    <a href="{% url 'users:recover_password' %}">¿Olvidó su contraseña?</a>
+  </p>
+  {% for message in messages %}
+    <div style="color: red;">{{ message }}</div>
+  {% endfor %}
+</div>
+{% endblock %}
+
+
+

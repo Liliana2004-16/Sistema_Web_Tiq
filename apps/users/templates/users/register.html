@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block content %}
+<div style="max-width:640px;margin:40px auto">
+  <h2>Registrar Usuario</h2>
+  <form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Crear usuario</button>
+  </form>
+  {% for message in messages %}
+    <div>{{ message }}</div>
+  {% endfor %}
+</div>
+{% endblock %}

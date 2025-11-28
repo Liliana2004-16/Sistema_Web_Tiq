@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block content %}
+<div style="padding:20px;">
+  <h2>Gestión de Usuarios</h2>
+  <table border="1" cellpadding="6">
+    <thead>
+      <tr><th>Nombre</th><th>Cédula</th><th>Correo</th><th>Empresa</th><th>Rol</th><th>Estado</th><th>Acciones</th></tr>
+    </thead>
+    <tbody>
+      {% for u in users %}
+      <tr>
+        <td>{{ u.first_name }} {{ u.last_name }}</td>
+        <td>{{ u.cedula }}</td>
+        <td>{{ u.email }}</td>
+        <td>{{ u.empresa }}</td>
+        <td>{{ u.rol }}</td>
+        <td>{{ u.is_active|yesno:"Activo,Inactivo" }}</td>
+        <td>
+          <form method="post" style="display:inline">
+            {% csrf_token %}
+            <input type="hidden" name="user_id" value="{{ u.id }}">
+            <button name="action" value="toggle_active" type="submit">
+              {% if u.is_active %}Desactivar{% else %}Activar{% endif %}
+            </button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  <br>
+  <a href="{% url 'users:register' %}">Registrar nuevo usuario</a>
+</div>
+{% endblock %}

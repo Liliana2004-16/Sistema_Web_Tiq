@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div style="padding: 40px;">
+    <h2>Registro de Pesaje</h2>
+
+    <a href="{% url 'ganaderia:registrar_pesaje' %}">← Volver al listado</a>
+    <br><br>
+
+    <form method="post">
+        {% csrf_token %}
+
+        <label>Animal:</label>
+        {{ form.animal }}
+        <br><br>
+
+        <label>Peso (kg):</label>
+        {{ form.peso }}
+        <br><br>
+
+        <label>Fecha del Pesaje:</label>
+        {{ form.fecha_pesaje }}
+        <br><br>
+
+        <button type="submit">Guardar</button>
+        <a href="{% url 'ganaderia:registrar_pesaje' %}">Cancelar</a>
+    </form>
+</div>
+
+{% endblock %}

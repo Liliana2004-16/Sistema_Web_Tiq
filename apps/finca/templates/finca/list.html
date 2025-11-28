@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Fincas</h2>
+
+<a href="{% url 'finca:create' %}">Nueva Finca</a>
+
+<table border="1">
+    <tr>
+        <th>Nombre</th>
+        <th>Código</th>
+        <th>Ubicación</th>
+        <th>Propietario</th>
+        <th></th>
+    </tr>
+
+    {% for finca in fincas %}
+    <tr>
+        <td>{{ finca.nombre }}</td>
+        <td>{{ finca.codigo }}</td>
+        <td>{{ finca.ubicacion }}</td>
+        <td>{{ finca.propietario }}</td>
+        <td>
+            <a href="{% url 'finca:update' finca.id %}">Editar</a> |
+            <a href="{% url 'finca:delete' finca.id %}">Eliminar</a>
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+{% endblock %}
+

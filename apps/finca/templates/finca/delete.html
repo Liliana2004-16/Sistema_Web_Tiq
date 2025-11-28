@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Eliminar Finca</h2>
+
+<p>¿Seguro que deseas eliminar la finca <b>{{ finca.nombre }}</b>?</p>
+
+<form method="POST">
+    {% csrf_token %}
+    <button type="submit">Sí, eliminar</button>
+</form>
+
+<a href="{% url 'finca:list' %}">Cancelar</a>
+{% endblock %}

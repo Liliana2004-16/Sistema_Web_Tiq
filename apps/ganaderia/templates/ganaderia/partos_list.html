@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="container mt-4">
+
+    <h2>Registro de Partos</h2>
+
+    <!-- FILTRO -->
+    <form method="get" class="form-inline mb-3">
+
+        <input type="text"
+            name="madre"
+            value="{{ madre_filter }}"
+            class="form-control"
+            placeholder="Filtrar por madre">
+
+        <button class="btn btn-primary">
+            <i class="fa fa-filter"></i> Aplicar
+        </button>
+
+        <a href="{% url 'ganaderia:partos_list' %}" class="btn btn-secondary ml-2">
+            Limpiar
+        </a>
+
+        <!-- BOTÓN REGISTRAR PARTO -->
+        <a href="{% url 'ganaderia:registrar_parto' %}" class="btn btn-success ml-auto">
+            <i class="fa fa-plus"></i> Registrar Parto
+        </a>
+
+        <!-- BOTÓN EXCEL -->
+        <a href="{% url 'ganaderia:partos_excel' %}" class="btn btn-success ml-2">
+            Descargar Excel
+        </a>
+
+    </form>
+
+    <!-- TABLA -->
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Número de Arete Madre</th>
+                <th>Fecha Nacimiento Cría</th>
+                <th>Nombre Madre</th>
+                <th>Número de Arete Cría</th>
+                <th>Finca</th>
+                <th>Raza</th>
+                <th>Sexo</th>
+                <th>Pesaje Cría (kg)</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            {% for p in partos %}
+            <tr>
+                <td>{{ p.madre.numero_arete }}</td>
+                <td>{{ p.fecha_nacimiento|date:"d/m/Y" }}</td>
+                <td>{{ p.madre.nombre }}</td>
+                <td>{{ p.cria.numero_arete }}</td>
+                <td>{{ p.finca.nombre }}</td>
+                <td>{{ p.raza }}</td>
+                <td>{{ p.sexo }}</td>
+                <td>{{ p.peso }}</td>
+
+                <td>
+                    <a href="#" class="text-primary"><i class="fa fa-edit"></i></a>
+                    <a href="#" class="text-danger ml-2"><i class="fa fa-trash"></i></a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+
+    </table>
+
+    <!-- PAGINACIÓN -->
+    <div>
+        Página {{ partos.number }} de {{ partos.paginator.num_pages }}
+    </div>
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-4">
+  <h2>Idetificacion animal</h2>
+    <form method="get" class="mb-3 d-flex" style="gap: 10px; align-items:center;">
+    
+    <!-- INPUT -->
+    <input 
+      type="text" 
+      name="q" 
+      placeholder="Buscar por arete o nombre" 
+      value="{{ request.GET.q }}" 
+      class="form-control"
+    />
+
+    <!-- BOTÓN CON ÍCONO -->
+    <button type="submit" class="btn" style="background: none; border: none; font-size: 35px; color: #0d6efd;">
+      <ion-icon name="search-circle-outline"></ion-icon>
+    </button>
+
+  </form>
+
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th>Arete</th><th>Nombre</th><th>Sexo</th><th>Raza</th><th>Finca</th><th>Estado</th><th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for a in animales %}
+      <tr>
+        <td>{{ a.numero_arete }}</td>
+        <td>{{ a.nombre }}</td>
+        <td>{{ a.sexo }}</td>
+        <td>{{ a.raza }}</td>
+        <td>{{ a.finca.nombre }}</td>
+        <td>{{ a.estado }}</td>
+        <td><a href="{% url 'ganaderia:animal_detail' a.pk %}" class="btn btn-sm btn-outline-primary">Ver</a></td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="7">No hay animales registrados</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

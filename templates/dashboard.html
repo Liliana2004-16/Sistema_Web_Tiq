@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div style="padding: 40px;">
+
+  <ul>
+
+    <!-- MÓDULO ADMINISTRACIÓN -->
+    {% if user.rol.nombre_rol == "Gerente" %}
+    <li>
+      <details>
+        <summary>Módulo Administración</summary>
+        <ul>
+          <li><a href="{% url 'users:users_list' %}">Gestión de Usuarios</a></li>
+          <li><a href="{% url 'users:register' %}">Registrar Usuario</a></li>
+        </ul>
+      </details>
+    </li>
+    {% endif %}
+
+    <!-- MÓDULO GESTIÓN ANIMAL -->
+    <li>
+      <details>
+        <summary>Gestión Animal</summary>
+        <ul>
+
+          <!-- LISTA DE ANIMALES (equivalente a identificación) -->
+          <li><a href="{% url 'ganaderia:animales_list' %}">Identificación de Animales</a></li>
+
+          <!-- PARTOS -->
+          <li><a href="{% url 'ganaderia:partos_list' %}">Registrar Partos</a></li>
+
+
+          <!-- PESAJES -->
+          <li><a href="{% url 'ganaderia:registrar_pesaje' %}">Registro de Pesajes</a></li>
+
+          <!-- EVENTOS DE SALIDA -->
+          <li><a href="{% url 'ganaderia:eventos_salida' %}">Eventos de Salida</a></li>
+
+          <!-- PRODUCCIÓN DE LECHE -->
+          <li><a href="{% url 'ganaderia:registrar_produccion' %}">Producción de Leche</a></li>
+
+          <!-- TRASLADOS -->
+          <li><a href="{% url 'ganaderia:traslados' %}">Traslados</a></li>
+
+          <li><a href="{% url 'finca:create' %}">Registrar Finca</a></li>
+
+        </ul>
+      </details>
+    </li>
+
+    <!-- MÓDULO SALUD -->
+    <li>
+      <details>
+        <summary>Salud Animal</summary>
+        <ul>
+          <li><a href=>Eventos Sanitarios</a></li>
+          <li><a href=>Inseminación</a></li>
+          <li><a href=>Confirmación de Gestación</a></li>
+        </ul>
+      </details>
+    </li>
+
+    <!-- INVENTARIO -->
+    <li><a href=>Inventario de Ganado</a></li>
+
+  </ul>
+
+  <br>
+  <a href="{% url 'users:logout' %}">Cerrar sesión</a>
+</div>
+
+{% endblock %}
+
