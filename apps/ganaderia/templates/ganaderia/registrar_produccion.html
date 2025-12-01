@@ -1,30 +1,124 @@
 {% extends "base.html" %}
 {% block content %}
 
-<div style="padding: 40px;">
-    <h2>Registro de Producción de Leche</h2>
+<style>
+.section {
+    display: none;
+}
+</style>
 
-    <a href="{% url 'ganaderia:registrar_produccion' %}">← Volver al listado</a>
-    <br><br>
+<div class="container mt-4">
 
-    <form method="post">
-        {% csrf_token %}
+    <h2>Producción de Leche</h2>
+    <p>Seleccione una opción:</p>
 
-        <label>Animal:</label>
-        {{ form.animal }}
+    <!-- BOTONES PRINCIPALES -->
+    <button class="btn btn-primary" onclick="mostrar('am')">Registro Mañana (AM)</button>
+    <button class="btn btn-warning" onclick="mostrar('pm')">Registro Tarde (PM)</button>
+    <button class="btn btn-success" onclick="mostrar('detalle')">Detalle de Registros</button>
+
+    <hr>
+
+    <!-- ===========================
+        SECCIÓN: FORMULARIO AM
+    ============================ -->
+    <div id="sec_am" class="section">
+
+        <h4>Registro de Producción - Mañana (AM)</h4>
+
+        <form method="POST" action="{% url 'ganaderia:produccion_am' %}">
+            {% csrf_token %}
+            {{ form_am.as_p }}
+
+            <button class="btn btn-primary">Guardar</button>
+        </form>
+
+    </div>
+
+    <!-- ===========================
+        SECCIÓN: FORMULARIO PM
+    ============================ -->
+    <div id="sec_pm" class="section">
+
+        <h4>Registro de Producción - Tarde (PM)</h4>
+
+        <form method="POST" action="{% url 'ganaderia:produccion_pm' %}">
+            {% csrf_token %}
+            {{ form_pm.as_p }}
+
+            <button class="btn btn-warning">Guardar</button>
+        </form>
+
+    </div>
+
+    <!-- ===========================
+        SECCIÓN: DETALLE DE REGISTROS
+    ============================ -->
+    <div id="sec_detalle" class="section">
+
+        <h4>Detalle de Producción</h4>
+
+        <form method="GET" action="{% url 'ganaderia:produccion_detalle' %}">
+            <label>Filtrar por mes:</label>
+            <select name="mes">
+                <option value="">-- Todos --</option>
+                {% for m in meses %}
+                <option value="{{ m }}" {% if mes == m %}selected{% endif %}>{{ m }}</option>
+                {% endfor %}
+            </select>
+            <button class="btn btn-info">Filtrar</button>
+        </form>
+
+        <br>
+
+        <a class="btn btn-success" href="{% url 'ganaderia:produccion_exportar' %}?mes={{ mes }}">Descargar Excel</a>
+
         <br><br>
 
-        <label>Litros producidos:</label>
-        {{ form.litros }}
-        <br><br>
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Fecha</th>
+                    <th>Arete</th>
+                    <th>Nombre</th>
+                    <th>Finca</th>
+                    <th>AM</th>
+                    <th>PM</th>
+                    <th>Total</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for p in producciones %}
+                <tr>
+                    <td>{{ p.fecha }}</td>
+                    <td>{{ p.animal.numero_arete }}</td>
+                    <td>{{ p.animal.nombre }}</td>
+                    <td>{{ p.finca.nombre }}</td>
+                    <td>{{ p.peso_am }}</td>
+                    <td>{{ p.peso_pm }}</td>
+                    <td>{{ p.total_diario }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
 
-        <label>Fecha:</label>
-        {{ form.fecha }}
-        <br><br>
+    </div>
 
-        <button type="submit">Registrar Producción</button>
-        <a href="{% url 'ganaderia:registrar_produccion' %}">Cancelar</a>
-    </form>
 </div>
+
+
+<script>
+function mostrar(seccion) {
+    // Ocultar todas las secciones
+    document.querySelectorAll('.section').forEach(function (sec) {
+        sec.style.display = 'none';
+    });
+
+    // Mostrar la seleccionada
+    if (seccion === 'am') document.getElementById('sec_am').style.display = 'block';
+    if (seccion === 'pm') document.getElementById('sec_pm').style.display = 'block';
+    if (seccion === 'detalle') document.getElementById('sec_detalle').style.display = 'block';
+}
+</script>
 
 {% endblock %}

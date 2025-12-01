@@ -3,6 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <title>{% block title %}Agrotiq{% endblock %}</title>
+    <link rel="stylesheet"
+      href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
     <style>
         .sidebar {
             width: 260px;
@@ -49,7 +51,7 @@
                 <ul>
                     <li><a href="{% url 'ganaderia:animales_list' %}">Identificación de Animales</a></li>
                     <li><a href="{% url 'ganaderia:partos_list' %}">Registrar Partos</a></li>
-                    <li><a href="{% url 'ganaderia:registrar_pesaje' %}">Registro de Pesajes</a></li>
+                    <li><a href="{% url 'ganaderia:pesajes_list' %}">Registro de Pesajes</a></li>
                     <li><a href="{% url 'ganaderia:eventos_salida' %}">Eventos de Salida</a></li>
                     <li><a href="{% url 'ganaderia:registrar_produccion' %}">Producción de Leche</a></li>
                     <li><a href="{% url 'ganaderia:traslados' %}">Traslados</a></li>

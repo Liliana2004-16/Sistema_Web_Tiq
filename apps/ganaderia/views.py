@@ -3,13 +3,15 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from .models import Animal, Pesaje, Parto, ProduccionLeche, EventoSalida
-from .forms import PesajeForm, PartoForm, ProduccionForm, EventoSalidaForm, TrasladoForm
+from .forms import PesajeForm, PartoForm, ProduccionForm, EventoSalidaForm, TrasladoForm, PesajeEditForm
 from .services import AnimalService
 from apps.users.decorators import role_required  # vamos a crear este decorador en users
 from django.core.paginator import Paginator
+import openpyxl
 from openpyxl import Workbook
-from django.http import HttpResponse
-from apps.ganaderia.models import Finca
+from django.http import HttpResponse, JsonResponse
+from apps.ganaderia.models import Finca, Animal
+
 
 @login_required
 def animales_list(request):
@@ -26,28 +28,120 @@ def animal_detail(request, pk):
     return render(request, 'ganaderia/animal_detail.html', {'animal': animal})
 
 @login_required
-@role_required("Gerente", "Administrador Finca")
+def buscar_animal_por_arete(request):
+    arete = request.GET.get("arete", "").strip()
 
-def registrar_pesaje_view(request):
-    if request.method == 'POST':
+    try:
+        animal = Animal.objects.get_by_arete(arete)
+        return JsonResponse({
+            "existe": True,
+            "nombre": animal.nombre,
+            "finca": animal.finca.nombre,
+        })
+    except Animal.DoesNotExist:
+        return JsonResponse({"existe": False})
+
+@login_required
+@role_required("Gerente", "Administrador Finca")
+def pesajes_list_view(request):
+
+    # --- REGISTRO DE PESAJE (POST) ---
+    if request.method == "POST":
         form = PesajeForm(request.POST)
+
         if form.is_valid():
-            data = form.cleaned_data
             try:
-                pesaje = AnimalService.registrar_pesaje(
-                    numero_arete=data['numero_arete'],
-                    fecha=data['fecha'],
-                    peso=data['peso'],
-                    finca=data['finca'],
+                AnimalService.registrar_pesaje(
+                    numero_arete=form.cleaned_data['numero_arete'],
+                    fecha=form.cleaned_data['fecha'],
+                    peso=form.cleaned_data['peso'],
+                    finca=form.cleaned_data['finca'],
                     usuario=request.user
                 )
+
                 messages.success(request, "Pesaje registrado exitosamente")
-                return redirect('ganaderia:registrar_pesaje')
-            except Exception as e:
-                form.add_error(None, str(e))
+                return redirect('ganaderia:pesajes_list')
+
+            except ValueError as e:
+                messages.error(request, str(e))
+
     else:
         form = PesajeForm()
-    return render(request, 'ganaderia/registrar_pesaje.html', {'form': form})
+
+    # --- LISTADO DE PESAJES ---
+    queryset = Pesaje.objects.all()
+
+    # filtro por mes
+    mes = request.GET.get('mes')
+    if mes:
+        queryset = queryset.filter(fecha__month=mes)
+
+    # Exportar Excel
+    if "exportar" in request.GET:
+        return exportar_pesajes_excel(queryset)
+
+    return render(request, 'ganaderia/pesajes_list.html', {
+        'pesajes': queryset,
+        'mes': mes,
+        'form': form
+    })
+
+@login_required
+@role_required("Gerente", "Administrador Finca")
+def pesaje_edit_view(request, pk):
+    pesaje = get_object_or_404(Pesaje, pk=pk)
+
+    if request.method == 'POST':
+        form = PesajeEditForm(request.POST, instance=pesaje)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Pesaje actualizado correctamente.")
+            return redirect('ganaderia:pesajes_list')
+    else:
+        form = PesajeEditForm(instance=pesaje)
+
+    return render(request, 'ganaderia/pesaje_edit.html', {'form': form})
+
+
+@login_required
+@role_required("Gerente", "Administrador Finca")
+def pesaje_delete_view(request, pk):
+    pesaje = get_object_or_404(Pesaje, pk=pk)
+
+    if request.method == "POST":
+        pesaje.delete()
+        messages.success(request, "Pesaje eliminado correctamente.")
+        return redirect('ganaderia:pesajes_list')
+
+    return render(request, 'ganaderia/pesaje_delete.html', {'pesaje': pesaje})
+
+
+def exportar_pesajes_excel(queryset):
+    wb = openpyxl.Workbook()
+    ws = wb.active
+    ws.title = "Pesajes"
+
+    # Encabezados
+    ws.append(["Fecha", "Arete", "Nombre", "Peso (kg)", "Finca"])
+
+    # Datos
+    for p in queryset:
+        ws.append([
+            p.fecha,
+            p.animal.numero_arete,
+            p.animal.nombre,
+            p.peso,
+            p.finca.nombre
+        ])
+
+    # Respuesta HTTP
+    response = HttpResponse(
+        content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    )
+    response['Content-Disposition'] = 'attachment; filename=pesajes.xlsx'
+
+    wb.save(response)
+    return response
 
 @login_required
 @role_required("Gerente", "Administrador Finca")
@@ -70,6 +164,24 @@ def partos_list(request):
     }
 
     return render(request, "ganaderia/partos_list.html", context)
+
+def editar_parto(request, id):
+    parto = get_object_or_404(Parto, id=id)
+
+    if request.method == 'POST':
+        form = PartoForm(request.POST, instance=parto)
+        if form.is_valid():
+            form.save()
+            return redirect('ganaderia:partos_list')
+    else:
+        form = PartoForm(instance=parto)
+
+    return render(request, 'ganaderia/editar_parto.html', {'form': form})
+
+def eliminar_parto(request, id):
+    parto = get_object_or_404(Parto, id=id)
+    parto.delete()
+    return redirect('ganaderia:partos_list')
 
 
 @login_required
@@ -168,28 +280,132 @@ def partos_excel(request):
     wb.save(response)
     return response
 
+
 @login_required
 @role_required("Gerente", "Administrador Finca")
-def registrar_produccion_view(request, turno=None):
-    if request.method == 'POST':
-        form = ProduccionForm(request.POST)
+def registrar_produccion_view(request):
+    mes = request.GET.get("mes")
+
+    producciones = ProduccionLeche.objects.all()
+    if mes:
+        producciones = producciones.filter(fecha__month=mes)
+
+    form_am = ProduccionForm(turno="AM")
+    form_pm = ProduccionForm(turno="PM")
+
+    meses = ["01","02","03","04","05","06","07","08","09","10","11","12"]
+
+    return render(request, "ganaderia/registrar_produccion.html", {
+        "form_am": form_am,
+        "form_pm": form_pm,
+        "producciones": producciones,
+        "mes": mes,
+        "meses": meses, 
+    })
+
+#   REGISTRO PRODUCCIÓN AM
+# ================================================================
+@login_required
+@role_required("Gerente", "Administrador Finca")
+def produccion_am_view(request):
+
+    if request.method == "POST":
+        form = ProduccionForm(request.POST, turno="AM")
+
         if form.is_valid():
-            cd = form.cleaned_data
-            try:
-                prod = AnimalService.registrar_produccion(
-                    numero_arete=cd['numero_arete'],
-                    fecha=cd['fecha'],
-                    peso_am=cd.get('peso_am'),
-                    peso_pm=cd.get('peso_pm'),
-                    usuario=request.user
-                )
-                messages.success(request, "Producción registrada exitosamente")
-                return redirect('ganaderia:registrar_produccion')
-            except Exception as e:
-                form.add_error(None, str(e))
-    else:
-        form = ProduccionForm()
-    return render(request, 'ganaderia/registrar_produccion.html', {'form': form})
+
+            animal = form.cleaned_data.get("animal")
+            finca = form.cleaned_data.get("finca")
+
+            if not animal:
+                messages.error(request, "No se encontró el animal. Verifique el número de arete.")
+                return redirect("ganaderia:produccion")
+
+            ProduccionLeche.objects.create(
+                fecha=form.cleaned_data['fecha'],
+                peso_am=form.cleaned_data['peso_am'],
+                animal=animal,
+                finca=finca
+            )
+
+            messages.success(request, "Producción AM registrada exitosamente")
+            return redirect("ganaderia:produccion")
+
+        messages.error(request, "Verifique los datos del formulario")
+
+    return redirect("ganaderia:produccion")
+
+
+# ================================================================
+#   REGISTRO PRODUCCIÓN PM
+# ================================================================
+@login_required
+@role_required("Gerente", "Administrador Finca")
+def produccion_pm_view(request):
+
+    if request.method == "POST":
+        form = ProduccionForm(request.POST, turno="PM")
+        if form.is_valid():
+
+            animal = form.cleaned_data['animal']
+            finca = form.cleaned_data['finca']
+
+            ProduccionLeche.objects.create(
+                fecha=form.cleaned_data['fecha'],
+                peso_pm=form.cleaned_data['peso_pm'],
+                animal=animal,
+                finca=finca
+            )
+
+            messages.success(request, "Producción PM registrada exitosamente")
+            return redirect("ganaderia:produccion")
+
+        messages.error(request, "Verifique el número de arete o el valor del peso")
+
+    return redirect("ganaderia:produccion")
+
+
+# ================================================================
+#   EXPORTAR REGISTROS A EXCEL
+# ================================================================
+@login_required
+@role_required("Gerente", "Administrador Finca")
+def produccion_export_excel(request):
+
+    mes = request.GET.get("mes")
+
+    datos = ProduccionLeche.objects.all()
+    if mes:
+        datos = datos.filter(fecha__month=mes)
+
+    wb = Workbook()
+    ws = wb.active
+    ws.title = "Producción"
+
+    # Cabeceras
+    ws.append(["Fecha", "Arete", "Nombre", "Finca", "AM", "PM", "Total Diario"])
+
+    # Filas
+    for p in datos:
+        ws.append([
+            p.fecha,
+            p.animal.numero_arete,
+            p.animal.nombre,
+            p.finca.nombre,
+            p.peso_am or 0,
+            p.peso_pm or 0,
+            p.total_diario,
+        ])
+
+    # Respuesta Excel
+    response = HttpResponse(
+        content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    )
+    response["Content-Disposition"] = "attachment; filename=produccion_leche.xlsx"
+    wb.save(response)
+
+    return response
+
 
 @login_required
 @role_required("Gerente", "Administrador Finca")

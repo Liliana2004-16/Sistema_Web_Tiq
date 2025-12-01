@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Eliminar Pesaje</h2>
+
+<p>¿Seguro que deseas eliminar el pesaje del animal <b>{{ pesaje.animal.numero_arete }}</b>?</p>
+
+<form method="post">
+    {% csrf_token %}
+    <button class="btn btn-danger" type="submit">Eliminar</button>
+    <a class="btn btn-secondary" href="{% url 'ganaderia:pesajes_list' %}">Cancelar</a>
+</form>
+
+{% endblock %}

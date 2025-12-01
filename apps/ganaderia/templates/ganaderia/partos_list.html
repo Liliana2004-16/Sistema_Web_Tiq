@@ -61,10 +61,18 @@
                 <td>{{ p.raza }}</td>
                 <td>{{ p.sexo }}</td>
                 <td>{{ p.peso }}</td>
-
                 <td>
-                    <a href="#" class="text-primary"><i class="fa fa-edit"></i></a>
-                    <a href="#" class="text-danger ml-2"><i class="fa fa-trash"></i></a>
+                    <!-- EDITAR -->
+                    <a href="{% url 'ganaderia:editar_parto' p.id %}" class="text-primary">
+                        <i class="fa fa-edit"></i>
+                    </a>
+
+                 <!-- ELIMINAR con confirmación -->
+                    <a href="{% url 'ganaderia:eliminar_parto' p.id %}"
+                    class="text-danger ml-2"
+                    onclick="return confirm('¿Seguro que deseas eliminar este parto?');">
+                        <i class="fa fa-trash"></i>
+                    </a>
                 </td>
             </tr>
             {% endfor %}

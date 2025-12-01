@@ -1,0 +1,154 @@
+{% extends 'base.html' %}
+{% load list_filters %}
+
+{% block content %}
+<h2>Pesajes</h2>
+
+<button id="btnMostrarForm" class="btn btn-primary mb-3">
+    Registrar pesaje
+</button>
+
+<div id="formPesaje" class="card p-3 mb-4" style="display: none;">
+    <h4>Registrar Pesaje</h4>
+    <form method="post">
+        {% csrf_token %}
+
+        {{ form.non_field_errors }}
+
+        <label>Número de arete:</label>
+        {{ form.numero_arete }}
+        <br>
+
+        <label>Nombre del animal:</label>
+        {{ form.nombre_animal }}
+        <br>
+
+        <label>Finca:</label>
+        {{ form.finca }}
+        <br>
+
+        <label>Peso (kg):</label>
+        {{ form.peso }}
+        <br>
+
+        <label>Fecha del pesaje:</label>
+        {{ form.fecha }}
+        <br>
+
+        <button type="submit" class="btn btn-success">Guardar</button>
+        <button type="button" id="btnCerrarForm" class="btn btn-secondary">Cancelar</button>
+    </form>
+</div>
+
+
+<!-- FORMULARIO DE FILTRO -->
+<form method="GET" class="form-inline mb-3">
+    <label class="mr-2">Filtrar por mes:</label>
+
+    <select name="mes" class="form-control mr-2">
+    <option value="">Todos</option>
+    {% for m in 1|to_list:12 %}
+        <option value="{{ m }}" {% if m|stringformat:"i" == mes|stringformat:"i" %}selected{% endif %}>
+            {{ m }}
+        </option>
+    {% endfor %}
+    </select>
+
+    <button class="btn btn-secondary" type="submit">Filtrar</button>
+
+    <a href="?exportar=1{% if mes %}&mes={{ mes }}{% endif %}" 
+       class="btn btn-success ml-2">
+        Exportar Excel
+    </a>
+</form>
+
+<!-- TABLA -->
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Fecha</th>
+            <th>Arete</th>
+            <th>Nombre</th>
+            <th>Peso (kg)</th>
+            <th>Finca</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        {% for p in pesajes %}
+        <tr>
+            <td>{{ p.fecha }}</td>
+            <td>{{ p.animal.numero_arete }}</td>
+            <td>{{ p.animal.nombre }}</td>
+            <td>{{ p.peso }}</td>
+            <td>
+                    <!-- EDITAR -->
+                    <a href="{% url 'ganaderia:pesaje_edit' p.id %}" class="text-primary">
+                        <i class="fa fa-edit"></i>
+                    </a>
+
+                 <!-- ELIMINAR con confirmación -->
+                    <a href="{% url 'ganaderia:pesaje_delete' p.id %}"
+                    class="text-danger ml-2"
+                    onclick="return confirm('¿Seguro que deseas eliminar este parto?');">
+                        <i class="fa fa-trash"></i>
+                    </a>
+                </td>
+
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="5" class="text-center">No hay registros</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+
+    const formDiv = document.getElementById("formPesaje");
+    const btnMostrar = document.getElementById("btnMostrarForm");
+    const btnCerrar = document.getElementById("btnCerrarForm");
+
+    btnMostrar.addEventListener("click", function() {
+        formDiv.style.display = "block";
+        window.scrollTo(0, formDiv.offsetTop);
+    });
+
+    btnCerrar.addEventListener("click", function() {
+        formDiv.style.display = "none";
+    });
+
+    // AUTOCOMPLETADO DEL ARETE
+    const inputArete = document.querySelector("#id_numero_arete");
+    const inputNombre = document.querySelector("#id_nombre_animal");
+    const inputFinca  = document.querySelector("#id_finca");
+
+    inputArete.addEventListener("keyup", function () {
+        let arete = inputArete.value.trim();
+
+        if (arete.length === 0) {
+            inputNombre.value = "";
+            inputFinca.value = "";
+            return;
+        }
+
+        fetch(`/ganaderia/ajax/buscar-animal/?arete=${arete}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.existe) {
+                    inputNombre.value = data.nombre;
+                    inputFinca.value = data.finca;
+                } else {
+                    inputNombre.value = "";
+                    inputFinca.value = "";
+                }
+            });
+    });
+
+});
+</script>
+
+
+{% endblock %}

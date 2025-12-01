@@ -7,15 +7,17 @@ class AnimalService:
     @staticmethod
     def get_by_arete(numero_arete):
         return Animal.objects.get_by_arete(numero_arete)
-
+    
     @staticmethod
-    @transaction.atomic
-    def registrar_pesaje(numero_arete, fecha, peso, finca, usuario=None):
+    def registrar_pesaje(numero_arete, fecha, peso, finca, usuario):
         animal = Animal.objects.get_by_arete(numero_arete)
-        if not animal:
-            raise ValidationError("El número de arete no corresponde a ningún animal registrado")
-        pesaje = Pesaje(animal=animal, fecha=fecha, peso=peso, finca=finca)
-        pesaje.full_clean()
+        
+        pesaje = Pesaje(
+            fecha=fecha,
+            peso=peso,
+            finca=finca,
+            animal=animal   # ✅ obligatorio
+        )
         pesaje.save()
         return pesaje
 
