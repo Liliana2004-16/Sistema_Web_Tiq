@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h2>Eventos de Salida</h2>
+
+<a class="btn btn-primary" href="{% url 'ganaderia:registrar_evento_salida' %}">
+    Registrar Salida
+</a>
+
+<form method="get" class="mt-3 mb-3">
+    <div class="row">
+        <div class="col">
+            <label>Fecha:</label>
+            <input type="date" name="fecha" value="{{ fecha }}" class="form-control">
+        </div>
+
+        <div class="col">
+            <label>Tipo:</label>
+            <select name="tipo" class="form-control">
+                <option value="">Todos</option>
+                <option value="venta" {% if tipo == "venta" %}selected{% endif %}>Venta</option>
+                <option value="muerte" {% if tipo == "muerte" %}selected{% endif %}>Muerte</option>
+            </select>
+        </div>
+
+        <div class="col-auto">
+            <button class="btn btn-success" type="submit">Filtrar</button>
+        </div>
+    </div>
+</form>
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Fecha</th>
+            <th>Arete</th>
+            <th>Animal</th>
+            <th>Evento</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% if eventos %}
+            {% for e in eventos %}
+            <tr>
+                <td>{{ e.fecha }}</td>
+                <td>{{ e.animal.numero_arete }}</td>
+                <td>{{ e.animal.nombre }}</td>
+                <td>{{ e.get_tipo_evento_display }}</td>
+            </tr>
+            {% endfor %}
+        {% else %}
+            <tr>
+                <td colspan="4">No se han registrado salidas hasta el momento</td>
+            </tr>
+        {% endif %}
+    </tbody>
+</table>
+
+{% endblock %}

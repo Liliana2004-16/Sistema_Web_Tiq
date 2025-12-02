@@ -11,6 +11,7 @@ import openpyxl
 from openpyxl import Workbook
 from django.http import HttpResponse, JsonResponse
 from apps.ganaderia.models import Finca, Animal
+from datetime import date
 
 
 @login_required
@@ -303,66 +304,76 @@ def registrar_produccion_view(request):
         "meses": meses, 
     })
 
+# ================================================================
 #   REGISTRO PRODUCCIÓN AM
 # ================================================================
-@login_required
-@role_required("Gerente", "Administrador Finca")
 def produccion_am_view(request):
-
     if request.method == "POST":
-        form = ProduccionForm(request.POST, turno="AM")
+        form = ProduccionForm(request.POST)
 
         if form.is_valid():
+            animal = form.cleaned_data["animal"]
+            finca = form.cleaned_data["finca"]
+            peso_am = form.cleaned_data["peso_am"]
+            fecha = form.cleaned_data["fecha"]
 
-            animal = form.cleaned_data.get("animal")
-            finca = form.cleaned_data.get("finca")
-
-            if not animal:
-                messages.error(request, "No se encontró el animal. Verifique el número de arete.")
-                return redirect("ganaderia:produccion")
-
-            ProduccionLeche.objects.create(
-                fecha=form.cleaned_data['fecha'],
-                peso_am=form.cleaned_data['peso_am'],
+            produccion, created = ProduccionLeche.objects.get_or_create(
                 animal=animal,
-                finca=finca
+                fecha=fecha,
+                defaults={
+                    "finca": finca,
+                    "peso_am": peso_am,
+                }
             )
 
-            messages.success(request, "Producción AM registrada exitosamente")
-            return redirect("ganaderia:produccion")
+            if not created:
+                produccion.peso_am = peso_am
+                produccion.save()
 
-        messages.error(request, "Verifique los datos del formulario")
+            messages.success(request, "Producción AM registrada correctamente.")
+            return redirect("ganaderia:registrar_produccion")
 
-    return redirect("ganaderia:produccion")
+    else:
+        form = ProduccionForm()
+
+    return render(request, "ganaderia/registrar_produccion.html", {"form": form})
 
 
 # ================================================================
 #   REGISTRO PRODUCCIÓN PM
 # ================================================================
-@login_required
-@role_required("Gerente", "Administrador Finca")
 def produccion_pm_view(request):
-
     if request.method == "POST":
-        form = ProduccionForm(request.POST, turno="PM")
+        form = ProduccionForm(request.POST)
+
         if form.is_valid():
+            animal = form.cleaned_data["animal"]
+            finca = form.cleaned_data["finca"]
+            peso_pm = form.cleaned_data["peso_pm"]
+            fecha = form.cleaned_data["fecha"]
 
-            animal = form.cleaned_data['animal']
-            finca = form.cleaned_data['finca']
-
-            ProduccionLeche.objects.create(
-                fecha=form.cleaned_data['fecha'],
-                peso_pm=form.cleaned_data['peso_pm'],
+            produccion, created = ProduccionLeche.objects.get_or_create(
                 animal=animal,
-                finca=finca
+                fecha=fecha,
+                defaults={
+                    "finca": finca,
+                    "peso_pm": peso_pm,
+                }
             )
 
-            messages.success(request, "Producción PM registrada exitosamente")
-            return redirect("ganaderia:produccion")
+            if not created:
+                produccion.peso_pm = peso_pm
+                produccion.save()
 
-        messages.error(request, "Verifique el número de arete o el valor del peso")
+            messages.success(request, "Producción PM registrada correctamente.")
+            return redirect("ganaderia:registrar_produccion")
 
-    return redirect("ganaderia:produccion")
+    else:
+        form = ProduccionForm()
+
+    # 🔥 CORREGIDO: antes decía resgistrar_produccion.html
+    return render(request, "ganaderia/registrar_produccion.html", {"form": form})
+
 
 
 # ================================================================
@@ -406,43 +417,108 @@ def produccion_export_excel(request):
 
     return response
 
-
 @login_required
-@role_required("Gerente", "Administrador Finca")
+@role_required("Gerente", "Auxiliar administrativa")
+def eventos_salida_list_view(request):
+
+    eventos = EventoSalida.objects.select_related("animal")
+
+    # --- FILTROS ---
+    fecha = request.GET.get("fecha", "")
+    tipo = request.GET.get("tipo", "")
+
+    if fecha:
+        eventos = eventos.filter(fecha=fecha)
+
+    if tipo:
+        eventos = eventos.filter(tipo_evento=tipo)
+
+    return render(request, "ganaderia/eventos_salida_list.html", {
+        "eventos": eventos,
+        "fecha": fecha,
+        "tipo": tipo,
+    })
+@login_required
+@role_required("Gerente", "Auxiliar administrativa")
 def registrar_evento_salida_view(request):
+
     if request.method == 'POST':
         form = EventoSalidaForm(request.POST)
         if form.is_valid():
-            cd = form.cleaned_data
+            data = form.cleaned_data
+
             try:
                 evento = AnimalService.registrar_evento_salida(
-                    numero_arete=cd['numero_arete'],
-                    fecha=cd['fecha'],
-                    tipo_evento=cd['tipo_evento'],
+                    numero_arete=data['numero_arete'],
+                    fecha=data['fecha'],
+                    tipo_evento=data['tipo_evento'],
                     usuario=request.user,
-                    observaciones=cd.get('observaciones','')
+                    observaciones=data.get('observaciones', '')
                 )
                 messages.success(request, "Evento de salida registrado exitosamente")
                 return redirect('ganaderia:eventos_salida')
+
             except Exception as e:
                 form.add_error(None, str(e))
+
     else:
         form = EventoSalidaForm()
-    return render(request, 'ganaderia/evento_salida.html', {'form': form})
+
+    return render(request, 'ganaderia/evento_salida_form.html', {'form': form})
+
+@login_required
+def api_animal_info(request):
+    arete = request.GET.get("arete", "").strip()
+
+    try:
+        animal = Animal.objects.get(numero_arete=arete)
+    except Animal.DoesNotExist:
+        return JsonResponse({"error": "No encontrado"}, status=404)
+
+    dias = (date.today() - animal.fecha_nacimiento).days
+
+    return JsonResponse({
+        "nombre": animal.nombre,
+        "dias_nacido": dias
+    })
+
+
 
 @login_required
 def traslados_view(request):
-    if request.method == 'POST':
-        form = TrasladoForm(request.POST)
-        if form.is_valid():
-            aretes = form.cleaned_data['lista_aretes']
-            finca_dest = form.cleaned_data['finca_destino']
-            try:
-                traslados = AnimalService.trasladar_animales(aretes, finca_dest, usuario=request.user)
-                messages.success(request, "Traslado(s) realizado(s) exitosamente")
-                return redirect('ganaderia:traslados')
-            except Exception as e:
-                form.add_error(None, str(e))
-    else:
-        form = TrasladoForm()
-    return render(request, 'ganaderia/traslados.html', {'form': form})
+
+    # --- FILTRO POR ARETE ---
+    q = request.GET.get("q", "")
+    animales = Animal.objects.all().select_related("finca")
+
+    if q:
+        animales = animales.filter(numero_arete__icontains=q)
+
+    fincas = Finca.objects.all()
+
+    if request.method == "POST":
+        aretes = request.POST.getlist("animales_seleccionados", [])
+        finca_destino_id = request.POST.get("finca_destino")
+
+        if not aretes:
+            messages.error(request, "Debe seleccionar al menos un animal para realizar el traslado")
+            return redirect("ganaderia:traslados")
+
+        try:
+            finca_destino = Finca.objects.get(id=finca_destino_id)
+        except Finca.DoesNotExist:
+            messages.error(request, "Debe seleccionar una finca destino válida")
+            return redirect("ganaderia:traslados")
+
+        try:
+            AnimalService.trasladar_animales(aretes, finca_destino, usuario=request.user)
+            messages.success(request, "Traslado realizado exitosamente")
+            return redirect("ganaderia:traslados")
+        except Exception as e:
+            messages.error(request, str(e))
+
+    return render(request, "ganaderia/traslados.html", {
+        "animales": animales,
+        "fincas": fincas,
+        "q": q
+    })

@@ -24,5 +24,7 @@ urlpatterns = [
     path('produccion/detalle/', views.registrar_produccion_view, name="produccion_detalle"),
 
     path('eventos-salida/', views.registrar_evento_salida_view, name='eventos_salida'),
+    path("api/animal-info/", views.api_animal_info, name="api_animal_info"),
+
     path('traslados/', views.traslados_view, name='traslados'),
 ]

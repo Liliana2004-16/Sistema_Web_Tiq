@@ -2,6 +2,7 @@
 from django.db import transaction
 from django.core.exceptions import ValidationError
 from .models import Animal, Pesaje, Parto, ProduccionLeche, EventoSalida, Traslado
+from django import forms
 
 class AnimalService:
     @staticmethod
@@ -75,24 +76,30 @@ class AnimalService:
         prod.save()
         return prod
 
-    @staticmethod
-    @transaction.atomic
-    def registrar_evento_salida(numero_arete, fecha, tipo_evento, usuario=None, observaciones=""):
-        animal = Animal.objects.get_by_arete(numero_arete)
+class EventoSalidaForm(forms.ModelForm):
+
+    numero_arete = forms.CharField(label="Número de Arete", max_length=50)
+    nombre = forms.CharField(required=False, disabled=True)
+    dias_nacido = forms.IntegerField(required=False, disabled=True)
+
+    class Meta:
+        model = EventoSalida
+        fields = ['fecha', 'tipo_evento', 'numero_arete', 'observaciones']
+
+    def clean(self):
+        cleaned = super().clean()
+        numero = cleaned.get('numero_arete')
+
+        animal = Animal.objects.get_by_arete(numero)
         if not animal:
-            raise ValidationError("El número de arete no corresponde a ningún animal registrado")
-        evento = EventoSalida(animal=animal, fecha=fecha, tipo_evento=tipo_evento, responsable=usuario, observaciones=observaciones)
-        evento.full_clean()
-        evento.save()
-        # actualizar estado del animal
-        if tipo_evento == 'venta':
-            animal.estado = 'vendido'
-        elif tipo_evento == 'muerte':
-            animal.estado = 'muerto'
-        else:
-            animal.estado = 'inactivo'
-        animal.save(update_fields=['estado'])
-        return evento
+            raise forms.ValidationError(
+                "El número de arete ingresado no corresponde a ningún animal registrado"
+            )
+
+        cleaned['animal'] = animal
+        return cleaned
+
+
 
     @staticmethod
     @transaction.atomic

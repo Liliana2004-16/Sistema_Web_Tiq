@@ -1,38 +1,56 @@
 {% extends "base.html" %}
 {% block content %}
 
-<div style="padding: 40px;">
-    <h2>Registro de Traslado</h2>
+<div class="container mt-4">
 
-    <a href="{% url 'ganaderia:traslados' %}">← Volver al listado</a>
-    <br><br>
+    <h2>Traslado de Animales</h2>
+
+    <form method="get" class="mb-3">
+        <input type="text" name="q" placeholder="Buscar por arete..." value="{{ q }}" class="form-control" />
+    </form>
 
     <form method="post">
         {% csrf_token %}
 
-        <label>Animal:</label>
-        {{ form.animal }}
-        <br><br>
+        <table class="table table-bordered table-striped">
+            <thead>
+                <tr>
+                    <th></th>
+                    <th>Número de Arete</th>
+                    <th>Nombre</th>
+                    <th>Finca Actual</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for animal in animales %}
+                <tr>
+                    <td>
+                        <input type="checkbox" name="animales_seleccionados" value="{{ animal.numero_arete }}">
+                    </td>
+                    <td>{{ animal.numero_arete }}</td>
+                    <td>{{ animal.nombre }}</td>
+                    <td>{{ animal.finca.nombre }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="4">No se encontraron animales.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
 
-        <label>Finca Origen:</label>
-        {{ form.finca_origen }}
-        <br><br>
+        <label>Seleccione finca destino:</label>
+        <select name="finca_destino" class="form-control" required>
+            <option value="">Seleccione...</option>
+            {% for finca in fincas %}
+            <option value="{{ finca.id }}">{{ finca.nombre }}</option>
+            {% endfor %}
+        </select>
 
-        <label>Finca Destino:</label>
-        {{ form.finca_destino }}
-        <br><br>
-
-        <label>Fecha:</label>
-        {{ form.fecha }}
-        <br><br>
-
-        <label>Observaciones:</label>
-        {{ form.observaciones }}
-        <br><br>
-
-        <button type="submit">Registrar Traslado</button>
-        <a href="{% url 'ganaderia:traslados' %}">Cancelar</a>
+        <br>
+        <button type="submit" class="btn btn-primary">Trasladar</button>
     </form>
+
 </div>
 
 {% endblock %}

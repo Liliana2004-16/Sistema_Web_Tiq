@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h2>Registrar Evento de Salida</h2>
+
+<a href="{% url 'ganaderia:eventos_salida' %}">← Volver</a>
+
+<form method="post" id="formSalida">
+    {% csrf_token %}
+
+    <label>Número de Arete:</label>
+    {{ form.numero_arete }}
+
+    <br><br>
+
+    <label>Nombre:</label>
+    {{ form.nombre }}
+
+    <br><br>
+
+    <label>Días de nacido:</label>
+    {{ form.dias_nacido }}
+
+    <br><br>
+
+    <label>Tipo de Evento:</label>
+    {{ form.tipo_evento }}
+
+    <br><br>
+
+    <label>Fecha:</label>
+    {{ form.fecha }}
+
+    <br><br>
+
+    <label>Observaciones:</label>
+    {{ form.observaciones }}
+
+    <br><br>
+
+    <button class="btn btn-primary" type="submit">Registrar evento</button>
+</form>
+
+<script>
+document.getElementById('id_numero_arete').addEventListener('change', function(){
+    fetch("/ganaderia/api/animal-info/?arete=" + this.value)
+    .then(response => response.json())
+    .then(data => {
+        document.getElementById('id_nombre').value = data.nombre;
+        document.getElementById('id_dias_nacido').value = data.dias_nacido;
+    });
+});
+</script>
+
+{% endblock %}

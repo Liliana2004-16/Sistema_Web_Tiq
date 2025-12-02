@@ -2,8 +2,9 @@
 from django import forms
 from .models import Pesaje, Parto, ProduccionLeche, EventoSalida, Animal, Traslado
 from apps.finca.models import Finca
-from apps.ganaderia.models import Pesaje 
-
+from apps.ganaderia.models import Pesaje
+from django.core.exceptions import ValidationError 
+from django.db import transaction
 
 class PesajeForm(forms.Form):
     numero_arete = forms.CharField(
@@ -128,35 +129,53 @@ class ProduccionForm(forms.ModelForm):
 
     def clean(self):
         cleaned = super().clean()
+
         numero = cleaned.get("numero_arete")
 
+    # Validación 1: campo vacío
         if not numero:
             raise forms.ValidationError("Debe ingresar un número de arete")
 
+    # Validación 2: buscar animal
         try:
             animal = Animal.objects.get(numero_arete=numero)
         except Animal.DoesNotExist:
-            raise forms.ValidationError("El número de arete ingresado no corresponde a ningún animal registrado")
+            raise forms.ValidationError(
+                "El número de arete ingresado no corresponde a ningún animal registrado"
+            )
 
-        cleaned['animal'] = animal
-        cleaned['finca'] = animal.finca
+    # Asignar al cleaned_data (ESTO ES LO QUE FALTABA)
+        cleaned["animal"] = animal
+        cleaned["finca"] = animal.finca
 
         return cleaned
 
+
+
 class EventoSalidaForm(forms.ModelForm):
-    numero_arete = forms.CharField(max_length=50)
+
+    numero_arete = forms.ChoiceField(label="Número de Arete")
+    nombre = forms.CharField(required=False, disabled=True)
+    dias_nacido = forms.IntegerField(required=False, disabled=True)
+
     class Meta:
         model = EventoSalida
         fields = ['fecha', 'tipo_evento', 'numero_arete', 'observaciones']
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        animales = Animal.objects.filter(estado="activo").order_by("numero_arete")
+        self.fields['numero_arete'].choices = [(a.numero_arete, a.numero_arete) for a in animales]
 
     def clean(self):
         cleaned = super().clean()
         numero = cleaned.get('numero_arete')
         animal = Animal.objects.get_by_arete(numero)
         if not animal:
-            raise forms.ValidationError("El número de arete ingresado no corresponde a ningún animal registrado")
+            raise forms.ValidationError("El número de arete ingresado no corresponde a ningún animal activo")
         cleaned['animal'] = animal
         return cleaned
+
 
 class TrasladoForm(forms.Form):
     lista_aretes = forms.CharField(widget=forms.Textarea, help_text="Ingrese aretes separados por comas")

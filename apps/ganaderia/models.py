@@ -147,12 +147,25 @@ class ProduccionLeche(models.Model):
         return (self.peso_am or 0) + (self.peso_pm or 0)
 
     def clean(self):
-        # validaciones
+
+    # 1. Evitar error cuando aún no se ha asignado animal
+        if not self.animal_id:  
+        # No podemos validar sexo si aún no hay animal: solo salimos
+            return
+
+    # 2. Validación: solo hembras producen leche
+    #   Ahora sí podemos acceder a self.animal con seguridad
         if self.animal.sexo != 'F':
             raise ValidationError("Solo hembras pueden registrar producción de leche.")
-        if (self.peso_am is not None and self.peso_am < 0) or (self.peso_pm is not None and self.peso_pm < 0):
+
+    # 3. Validación de pesos >= 0
+        if (self.peso_am is not None and self.peso_am < 0) or \
+            (self.peso_pm is not None and self.peso_pm < 0):
             raise ValidationError("Los valores de peso deben ser >= 0.")
-        super().clean()
+
+        return super().clean()
+
+
 
 # apps/ganaderia/models.py (append)
 class EventoSalida(models.Model):
