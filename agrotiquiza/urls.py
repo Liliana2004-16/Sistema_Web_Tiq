@@ -24,6 +24,7 @@ urlpatterns = [
     path('', include('apps.users.urls')),          # incluye las rutas de users
     path('ganaderia/', include('apps.ganaderia.urls')),
     path('finca/', include('apps.finca.urls')),
+    path('salud/', include('apps.salud.urls')),
 
 ]
 

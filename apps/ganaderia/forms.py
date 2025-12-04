@@ -151,30 +151,38 @@ class ProduccionForm(forms.ModelForm):
         return cleaned
 
 
-
 class EventoSalidaForm(forms.ModelForm):
 
-    numero_arete = forms.ChoiceField(label="Número de Arete")
+    numero_arete = forms.CharField(label="Número de Arete", max_length=50)
     nombre = forms.CharField(required=False, disabled=True)
     dias_nacido = forms.IntegerField(required=False, disabled=True)
 
     class Meta:
         model = EventoSalida
-        fields = ['fecha', 'tipo_evento', 'numero_arete', 'observaciones']
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        animales = Animal.objects.filter(estado="activo").order_by("numero_arete")
-        self.fields['numero_arete'].choices = [(a.numero_arete, a.numero_arete) for a in animales]
+        fields = ['fecha', 'tipo_evento', 'observaciones']
+        widgets = {
+            'fecha': forms.DateInput(attrs={'type': 'date'})
+            }
 
     def clean(self):
         cleaned = super().clean()
         numero = cleaned.get('numero_arete')
-        animal = Animal.objects.get_by_arete(numero)
-        if not animal:
-            raise forms.ValidationError("El número de arete ingresado no corresponde a ningún animal activo")
-        cleaned['animal'] = animal
+
+        try:
+            animal = Animal.objects.get_by_arete(numero)
+        except Animal.DoesNotExist:
+            raise forms.ValidationError("El número de arete no existe.")
+
+        self.cleaned_data['animal'] = animal
         return cleaned
+
+    def save(self, commit=True):
+        evento = super().save(commit=False)
+        evento.animal = self.cleaned_data['animal']
+        if commit:
+            evento.save()
+        return evento
+
 
 
 class TrasladoForm(forms.Form):

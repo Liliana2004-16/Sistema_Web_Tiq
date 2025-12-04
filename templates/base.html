@@ -5,6 +5,8 @@
     <title>{% block title %}Agrotiq{% endblock %}</title>
     <link rel="stylesheet"
       href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
     <style>
         .sidebar {
             width: 260px;
@@ -52,7 +54,7 @@
                     <li><a href="{% url 'ganaderia:animales_list' %}">Identificación de Animales</a></li>
                     <li><a href="{% url 'ganaderia:partos_list' %}">Registrar Partos</a></li>
                     <li><a href="{% url 'ganaderia:pesajes_list' %}">Registro de Pesajes</a></li>
-                    <li><a href="{% url 'ganaderia:eventos_salida' %}">Eventos de Salida</a></li>
+                    <li><a href="{% url 'ganaderia:eventos_salida_list' %}">Eventos de Salida</a></li>
                     <li><a href="{% url 'ganaderia:registrar_produccion' %}">Producción de Leche</a></li>
                     <li><a href="{% url 'ganaderia:traslados' %}">Traslados</a></li>
                     <li><a href="{% url 'finca:create' %}">Registrar Finca</a></li>
@@ -64,9 +66,9 @@
             <details>
                 <summary>Salud Animal</summary>
                 <ul>
-                    <li><a href="">Eventos Sanitarios</a></li>
-                    <li><a href="">Inseminación</a></li>
-                    <li><a href="">Confirmación de Gestación</a></li>
+                    <li><a href="{% url 'salud:evento_sanitario_list' %}">Eventos Sanitarios</a></li>
+                    <li><a href="{% url 'salud:inseminacion_list' %}">Inseminación</a></li>
+                    <li><a href="{% url 'salud:gestacion_pendientes' %}">Confirmación de Gestación</a></li>
                 </ul>
             </details>
         </li>

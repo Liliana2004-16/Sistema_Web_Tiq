@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+
+<div class="container mt-4">
+    <h3>Registro de Inseminación</h3>
+
+    <form method="POST">
+        {% csrf_token %}
+        
+        <label>Número de Arete:</label>
+        <input type="text" id="numero_arete" class="form-control mb-2">
+        
+        <label>Nombre del Animal:</label>
+        <input type="text" id="nombre_animal" class="form-control mb-2" readonly>
+        
+        <label>Edad (días):</label>
+        <input type="text" id="edad_animal" class="form-control mb-3" readonly>
+
+        {{ form.as_p }}
+
+        <button class="btn btn-success">Guardar Registro</button>
+    </form>
+</div>
+
+
+<script>
+document.getElementById("numero_arete").addEventListener("change", function () {
+    const numero = this.value;
+
+    fetch(`/salud/buscar-animal/?numero_arete=${numero}`)
+        .then(r => r.json())
+        .then(data => {
+            document.getElementById("nombre_animal").value = data.nombre;
+            document.getElementById("edad_animal").value = data.edad;
+        })
+        .catch(() => {
+            alert("Animal no encontrado");
+        });
+});
+</script>
+
+{% endblock %}

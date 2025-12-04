@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-5">
+
+    <div class="card shadow p-4 border-danger">
+
+        <h4 class="text-danger">¿Eliminar Evento Sanitario?</h4>
+
+        <p>Está a punto de eliminar el evento del animal <strong>{{ evento.animal.nombre }}</strong> del día <strong>{{ evento.fecha }}</strong>.</p>
+
+        <form method="POST">
+            {% csrf_token %}
+            <button class="btn btn-danger">Eliminar</button>
+            <a href="{% url 'salud:evento_sanitario_list' %}" class="btn btn-secondary">Cancelar</a>
+        </form>
+
+    </div>
+
+</div>
+{% endblock %}

@@ -23,8 +23,12 @@ urlpatterns = [
     path('produccion/exportar/', views.produccion_export_excel, name="produccion_exportar"),
     path('produccion/detalle/', views.registrar_produccion_view, name="produccion_detalle"),
 
-    path('eventos-salida/', views.registrar_evento_salida_view, name='eventos_salida'),
+    path('eventos-salida/', views.eventos_salida_list_view, name='eventos_salida_list'),
+    path('eventos-salida/registrar/', views.registrar_evento_salida_view, name='registrar_evento_salida'),
+    path('eventos-salida/eliminar/<int:id>/', views.evento_salida_eliminar, name='evento_salida_eliminar'),
+
     path("api/animal-info/", views.api_animal_info, name="api_animal_info"),
 
     path('traslados/', views.traslados_view, name='traslados'),
 ]
+

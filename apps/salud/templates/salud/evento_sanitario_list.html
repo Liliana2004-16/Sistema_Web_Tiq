@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-4">
+
+    <h2 class="mb-3">Eventos Sanitarios</h2>
+
+    <!-- Filtro por mes -->
+    <form method="GET" class="form-inline mb-3">
+        <label for="mes" class="mr-2">Filtrar por mes:</label>
+            <select name="mes" onchange="this.form.submit()">
+            <option value="">-- Todos los meses --</option>
+            <option value="1"  {% if mes_seleccionado == '1' %}selected{% endif %}>Enero</option>
+            <option value="2"  {% if mes_seleccionado == '2' %}selected{% endif %}>Febrero</option>
+            <option value="3"  {% if mes_seleccionado == '3' %}selected{% endif %}>Marzo</option>
+            <option value="4"  {% if mes_seleccionado == '4' %}selected{% endif %}>Abril</option>
+            <option value="5"  {% if mes_seleccionado == '5' %}selected{% endif %}>Mayo</option>
+            <option value="6"  {% if mes_seleccionado == '6' %}selected{% endif %}>Junio</option>
+            <option value="7"  {% if mes_seleccionado == '7' %}selected{% endif %}>Julio</option>
+            <option value="8"  {% if mes_seleccionado == '8' %}selected{% endif %}>Agosto</option>
+            <option value="9"  {% if mes_seleccionado == '9' %}selected{% endif %}>Septiembre</option>
+            <option value="10" {% if mes_seleccionado == '10' %}selected{% endif %}>Octubre</option>
+            <option value="11" {% if mes_seleccionado == '11' %}selected{% endif %}>Noviembre</option>
+            <option value="12" {% if mes_seleccionado == '12' %}selected{% endif %}>Diciembre</option>
+        </select>
+
+        <a href="{% url 'salud:evento_sanitario_create' %}" class="btn btn-success ml-3">
+            Registrar Evento
+        </a>
+
+        <a href="{% url 'salud:export_eventos_excel' %}?mes={{ request.GET.mes }}" class="btn btn-info ml-3">
+            Descargar Reporte
+        </a>
+    </form>
+
+    <!-- Tabla de eventos -->
+    <table class="table table-bordered table-striped">
+        <thead>
+            <tr>
+                <th>Fecha</th>
+                <th>Arete</th>
+                <th>Animal</th>
+                <th>Diagnóstico</th>
+                <th>Tratamiento</th>
+                <th>Responsable</th>
+                <th>Síntomas</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for e in eventos %}
+            <tr>
+                <td>{{ e.fecha }}</td>
+                <td>{{ e.animal.numero_arete }}</td>
+                <td>{{ e.animal.nombre }}</td>
+                <td>{{ e.diagnostico }}</td>
+                <td>{{ e.tratamiento }}</td>
+                <td>{{ e.responsable }}</td>
+                <td>{{ e.sintomas }}</td>
+
+                <td>
+                    <!-- Editar -->
+                    <a href="{% url 'salud:evento_sanitario_edit' e.id %}" class="text-primary">
+                        <i class="fa fa-edit"></i>
+                    </a>
+
+                    <!-- Eliminar -->
+                    <a href="{% url 'salud:evento_sanitario_delete' e.id %}"
+                       class="text-danger ml-2"
+                       onclick="return confirm('¿Seguro que deseas eliminar este evento sanitario?');">
+                        <i class="fa fa-trash"></i>
+                    </a>
+                </td>
+
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="8" class="text-center">No hay registros.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+</div>
+{% endblock %}

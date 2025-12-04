@@ -36,6 +36,8 @@
             <th>Arete</th>
             <th>Animal</th>
             <th>Evento</th>
+            <th>Acciones</th>
+            <th>Observaciones</th>
         </tr>
     </thead>
     <tbody>
@@ -46,11 +48,25 @@
                 <td>{{ e.animal.numero_arete }}</td>
                 <td>{{ e.animal.nombre }}</td>
                 <td>{{ e.get_tipo_evento_display }}</td>
+                <td>{{ e.observaciones }}</td>
+
+                
+                <!-- COLUMNA DE ACCIONES -->
+            <td>
+                <!-- ELIMINAR con confirmación -->
+                <a href="{% url 'ganaderia:evento_salida_eliminar' e.id %}"
+                class="text-danger ml-2"
+                onclick="return confirm('¿Seguro que deseas eliminar este evento de salida?');">
+                <i class="fa fa-trash"></i>
+                </a>
+            </td>
+
+
             </tr>
             {% endfor %}
         {% else %}
             <tr>
-                <td colspan="4">No se han registrado salidas hasta el momento</td>
+                <td colspan="5">No se han registrado salidas hasta el momento</td>
             </tr>
         {% endif %}
     </tbody>

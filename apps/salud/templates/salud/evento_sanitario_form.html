@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-4">
+
+    <h2>Registrar Evento Sanitario</h2>
+
+
+    <form method="POST">
+        {% csrf_token %}
+
+        <div class="form-group">
+            <label>Fecha del evento:</label>
+            {{ form.fecha }}
+        </div>
+
+        <div class="form-group">
+            <label>Número de Arete:</label>
+            <input type="hidden" id="id_animal" name="animal" value="{{ form.instance.animal.id }}">
+            <input type="text" id="arete" class="form-control" name="numero_arete">
+            <button type="button" id="buscar" class="btn btn-secondary mt-2">Buscar Animal</button>
+        </div>
+
+        <div class="form-group">
+            <label>Nombre del Animal:</label>
+            <input type="text" id="nombre" class="form-control" readonly>
+        </div>
+
+        <div class="form-group">
+            <label>Edad (días):</label>
+            <input type="text" id="edad" class="form-control" readonly>
+        </div>
+
+        <div class="form-group">
+            <label>Diagnóstico:</label>
+            {{ form.diagnostico }}
+        </div>
+
+        <div class="form-group">
+            <label>Tratamiento Aplicado:</label>
+            {{ form.tratamiento }}
+        </div>
+
+        <div class="form-group">
+            <label>Responsable:</label>
+            {{ form.responsable }}
+        </div>
+
+        <div class="form-group">
+            <label>Síntomas Observados (opcional):</label>
+            {{ form.sintomas }}
+        </div>
+
+        <button class="btn btn-primary">Guardar Evento</button>
+
+    </form>
+
+</div>
+
+<script>
+document.getElementById("buscar").addEventListener("click", function() {
+    let arete = document.getElementById("arete").value;
+
+    fetch(`/salud/buscar-animal/?arete=${arete}`)
+        .then(res => res.json())
+        .then(data => {
+            if (data.error) {
+                alert("Animal no encontrado.");
+            } else {
+                document.getElementById("nombre").value = data.nombre;
+                document.getElementById("edad").value = data.edad;
+                document.getElementById("id_animal").value = data.id;
+            }
+        });
+});
+</script>
+
+{% endblock %}

@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container mt-4">
+    <h3>Registros de Inseminación</h3>
+
+    <a href="{% url 'salud:inseminacion_create' %}" class="btn btn-primary mb-3">
+        Registrar nueva inseminación
+    </a>
+
+    <table class="table table-bordered table-striped">
+        <thead>
+            <tr>
+                <th>Fecha</th>
+                <th>Número Arete</th>
+                <th>Animal</th>
+                <th>Tipo de semen</th>
+                <th>Inseminador</th>
+                <th>Responsable</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            {% for r in registros %}
+            <tr>
+                <td>{{ r.fecha }}</td>
+                <td>{{ r.animal.numero_arete }}</td>
+                <td>{{ r.animal.nombre }}</td>
+                <td>{{ r.tipo_semen }}</td>
+                <td>{{ r.inseminador }}</td>
+                <td>{{ r.responsable.username }}</td>
+
+                <td>
+                    <a href="{% url 'salud:inseminacion_edit' r.id %}" class="text-primary">
+                        <i class="fa fa-edit"></i>
+                    </a>
+
+                    <a href="{% url 'salud:inseminacion_delete' r.id %}"
+                       class="text-danger ml-2"
+                       onclick="return confirm('¿Seguro que deseas eliminar este registro?');">
+                        <i class="fa fa-trash"></i>
+                    </a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+</div>
+
+{% endblock %}

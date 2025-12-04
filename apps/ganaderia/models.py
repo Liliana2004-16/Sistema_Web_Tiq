@@ -183,9 +183,24 @@ class EventoSalida(models.Model):
         verbose_name_plural = 'Eventos de Salida'
 
     def clean(self):
-        if self.animal.estado in ['vendido', 'muerto']:
+        from django.core.exceptions import ValidationError
+
+        # 1. Evitar error cuando aún no se ha asignado un animal
+        if not self.animal_id:
+            # Si prefieres que simplemente no valide en este punto:
+            return
+        # O si quieres obligar a que haya un animal, usa:
+        # raise ValidationError("Debe seleccionar un animal antes de registrar el evento.")
+
+    # 2. Recuperar el animal de manera segura
+        animal = self.animal
+
+    # 3. Validar estado del animal
+        if animal.estado in ['vendido', 'muerto']:
             raise ValidationError("El animal ya tiene un evento de salida registrado.")
+
         super().clean()
+
 
 # apps/ganaderia/models.py (append)
 class Traslado(models.Model):

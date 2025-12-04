@@ -421,7 +421,7 @@ def produccion_export_excel(request):
 @role_required("Gerente", "Auxiliar administrativa")
 def eventos_salida_list_view(request):
 
-    eventos = EventoSalida.objects.select_related("animal")
+    eventos = EventoSalida.objects.select_related("animal").all()
 
     # --- FILTROS ---
     fecha = request.GET.get("fecha", "")
@@ -438,33 +438,33 @@ def eventos_salida_list_view(request):
         "fecha": fecha,
         "tipo": tipo,
     })
+
 @login_required
 @role_required("Gerente", "Auxiliar administrativa")
 def registrar_evento_salida_view(request):
 
     if request.method == 'POST':
         form = EventoSalidaForm(request.POST)
+        print("\n==== POST RECIBIDO ====")
+        print(request.POST)
+
         if form.is_valid():
-            data = form.cleaned_data
+            print("==== FORM VALIDO ====")
+            evento = form.save()
+            print("==== EVENTO GUARDADO ====")
+            print(evento.id, evento.animal_id, evento.tipo_evento)
 
-            try:
-                evento = AnimalService.registrar_evento_salida(
-                    numero_arete=data['numero_arete'],
-                    fecha=data['fecha'],
-                    tipo_evento=data['tipo_evento'],
-                    usuario=request.user,
-                    observaciones=data.get('observaciones', '')
-                )
-                messages.success(request, "Evento de salida registrado exitosamente")
-                return redirect('ganaderia:eventos_salida')
-
-            except Exception as e:
-                form.add_error(None, str(e))
+            messages.success(request, "Evento de salida registrado exitosamente")
+            return redirect('ganaderia:eventos_salida_list')
+        else:
+            print("==== ERRORES DE FORM ====")
+            print(form.errors)
 
     else:
         form = EventoSalidaForm()
 
     return render(request, 'ganaderia/evento_salida_form.html', {'form': form})
+
 
 @login_required
 def api_animal_info(request):
@@ -481,6 +481,14 @@ def api_animal_info(request):
         "nombre": animal.nombre,
         "dias_nacido": dias
     })
+
+@login_required
+@role_required("Gerente", "Auxiliar administrativa")
+def evento_salida_eliminar(request, id):
+    evento = get_object_or_404(EventoSalida, id=id)
+    evento.delete()
+    messages.success(request, "Evento eliminado correctamente.")
+    return redirect('ganaderia:eventos_salida_list')
 
 
 
