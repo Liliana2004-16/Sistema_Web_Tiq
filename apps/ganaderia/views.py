@@ -12,7 +12,7 @@ from openpyxl import Workbook
 from django.http import HttpResponse, JsonResponse
 from apps.ganaderia.models import Finca, Animal
 from datetime import date
-
+from django.db.models import Q
 
 @login_required
 def animales_list(request):
@@ -181,6 +181,17 @@ def editar_parto(request, id):
 
 def eliminar_parto(request, id):
     parto = get_object_or_404(Parto, id=id)
+    madre = parto.madre
+    cria = parto.cria
+
+    # Si eliminas el parto, la madre debe volver a "gestante"
+    madre.estado = "Gestante"
+    madre.save()
+
+    # Si quieres eliminar la cría también:
+    if cria:
+        cria.delete()
+
     parto.delete()
     return redirect('ganaderia:partos_list')
 
@@ -236,12 +247,23 @@ def registrar_parto_view(request):
             created_by=request.user
         )
 
+        madre.estado = "activo"
+        madre.save()
+
+
         messages.success(request, "Parto registrado exitosamente.")
         return redirect("ganaderia:partos_list")
+    
+    estados_validos = ["activo", "Gestante", "trasladado"]
 
     # GET → Mostrar formulario
     fincas = Finca.objects.all()
-    madres = Animal.objects.filter(sexo="F")
+    madres = Animal.objects.filter(
+        estado__in=estados_validos
+    ).filter(
+        Q(sexo__iexact="F") | Q(sexo__icontains="hemb")
+    )
+
 
     return render(request, "ganaderia/registrar_parto.html", {
         "fincas": fincas,
@@ -486,6 +508,11 @@ def api_animal_info(request):
 @role_required("Gerente", "Auxiliar administrativa")
 def evento_salida_eliminar(request, id):
     evento = get_object_or_404(EventoSalida, id=id)
+    animal = evento.animal
+
+    # --- Restaurar estado ---
+    animal.estado = "Activo"   # O el estado anterior si lo guardas en otro campo
+    animal.save()
     evento.delete()
     messages.success(request, "Evento eliminado correctamente.")
     return redirect('ganaderia:eventos_salida_list')

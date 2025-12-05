@@ -62,6 +62,8 @@ class AnimalService:
             sexo=sexo,
             created_by=usuario
         )
+        madre.estado = "activo"
+        madre.save()
 
         return parto
 
@@ -75,6 +77,28 @@ class AnimalService:
         prod.full_clean()
         prod.save()
         return prod
+
+    
+    @staticmethod
+    @transaction.atomic
+    def trasladar_animales(lista_aretes, finca_destino, usuario=None):
+        traslados = []
+        for arete in lista_aretes:
+            animal = Animal.objects.filter(numero_arete=arete).first()
+            if not animal:
+                raise ValidationError(f"No existe el animal con arete {arete}")
+            if animal.finca_id == finca_destino.id:
+                raise ValidationError(f"El animal {arete} ya está en la finca seleccionada")
+            traslado = Traslado(finca_origen=animal.finca, finca_destino=finca_destino, animal=animal, usuario=usuario)
+            traslado.full_clean()
+            traslado.save()
+            # actualizar animal
+            animal.finca = finca_destino
+            animal.estado = 'trasladado'
+            animal.save(update_fields=['finca', 'estado'])
+            traslados.append(traslado)
+        return traslados
+
 
 class EventoSalidaForm(forms.ModelForm):
 
@@ -100,23 +124,3 @@ class EventoSalidaForm(forms.ModelForm):
         return cleaned
 
 
-
-    @staticmethod
-    @transaction.atomic
-    def trasladar_animales(lista_aretes, finca_destino, usuario=None):
-        traslados = []
-        for arete in lista_aretes:
-            animal = Animal.objects.get_by_arete(arete)
-            if not animal:
-                raise ValidationError(f"No existe el animal con arete {arete}")
-            if animal.finca_id == finca_destino.id:
-                raise ValidationError(f"El animal {arete} ya está en la finca seleccionada")
-            traslado = Traslado(finca_origen=animal.finca, finca_destino=finca_destino, animal=animal, usuario=usuario)
-            traslado.full_clean()
-            traslado.save()
-            # actualizar animal
-            animal.finca = finca_destino
-            animal.estado = 'trasladado'
-            animal.save(update_fields=['finca', 'estado'])
-            traslados.append(traslado)
-        return traslados

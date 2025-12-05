@@ -9,7 +9,7 @@
         <input type="text" name="q" placeholder="Buscar por arete..." value="{{ q }}" class="form-control" />
     </form>
 
-    <form method="post">
+    <form method="post" action="{% url 'ganaderia:traslados' %}">
         {% csrf_token %}
 
         <table class="table table-bordered table-striped">
