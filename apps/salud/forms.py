@@ -16,11 +16,10 @@ class EventoSanitarioForm(forms.ModelForm):
 class InseminacionForm(forms.ModelForm):
     class Meta:
         model = Inseminacion
-        fields = ['fecha', 'animal', 'tipo_semen', 'inseminador']
+        fields = ['fecha', 'tipo_semen', 'inseminador']  # quitar 'animal'
         widgets = {
             'fecha': forms.DateInput(attrs={'type': 'date'}),
             'inseminador': forms.TextInput(attrs={'placeholder': 'Nombre del inseminador'}),
-            'animal': forms.HiddenInput(),
         }
 
 class ConfirmacionGestacionForm(forms.ModelForm):
@@ -34,6 +33,14 @@ class ConfirmacionGestacionForm(forms.ModelForm):
             'responsable',
             'observaciones'
         ]
+
         widgets = {
             'fecha_confirmacion': forms.DateInput(attrs={'type': 'date'}),
+            'metodo_diagnostico': forms.Select(choices=[
+                ('palpación', 'Palpación'),
+                ('ecografía', 'Ecografía'),
+                ('laboratorio', 'Laboratorio'),
+                ('otro', 'Otro'),
+            ])
         }
+

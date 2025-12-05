@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+
+<h3>Confirmar Gestación</h3>
+
+<p><strong>Vaca:</strong> {{ inseminacion.animal.numero_arete }} - {{ inseminacion.animal.nombre }}</p>
+<p><strong>Fecha Inseminación:</strong> {{ inseminacion.fecha }}</p>
+
+<form method="POST">
+    {% csrf_token %}
+    {{ form.as_p }}
+
+    <button class="btn btn-success">Registrar Confirmación</button>
+    <a href="{% url 'salud:gestacion_pendientes' %}" class="btn btn-secondary">Cancelar</a>
+</form>
+
+{% endblock %}

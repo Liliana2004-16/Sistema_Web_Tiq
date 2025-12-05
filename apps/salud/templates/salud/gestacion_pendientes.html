@@ -1,1 +1,40 @@
-    
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+
+<h3>Confirmación de Gestación – Pendientes</h3>
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Arete</th>
+            <th>Nombre</th>
+            <th>Fecha Inseminación</th>
+            <th>Tipo Semen</th>
+            <th>Inseminador</th>
+            <th>Estado</th>
+            <th>Confirmar</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for ins in pendientes %}
+        <tr>
+            <td>{{ ins.animal.numero_arete }}</td>
+            <td>{{ ins.animal.nombre }}</td>
+            <td>{{ ins.fecha }}</td>
+            <td>{{ ins.tipo_semen }}</td>
+            <td>{{ ins.inseminador }}</td>
+            <td>Pendiente</td>
+            <td>
+                <a href="{% url 'salud:confirmar_gestacion' ins.id %}" class="btn btn-primary btn-sm">
+                    Confirmar
+                </a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<a href="{% url 'salud:gestacion_historial' %}" class="btn btn-info">Ver Historial</a>
+
+{% endblock %}

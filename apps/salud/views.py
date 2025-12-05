@@ -9,7 +9,7 @@ from apps.ganaderia.models import Animal
 from apps.ganaderia.services import AnimalService
 import openpyxl
 from datetime import date
-from .services import EventoSanitarioService, InseminacionService
+from .services import EventoSanitarioService, InseminacionService, GestacionService
 
 
 def evento_sanitario_list(request):
@@ -130,7 +130,6 @@ def evento_sanitario_delete(request, pk):
         "evento": evento
     })
 
-
 @login_required
 @role_required("Gerente", "Administrador finca")
 def inseminacion_create(request):
@@ -142,11 +141,15 @@ def inseminacion_create(request):
         if form.is_valid():
             data = form.cleaned_data
 
+            numero_arete = request.POST.get("numero_arete")
+
             try:
+                animal = AnimalService.get_by_arete(numero_arete)
+
                 InseminacionService.registrar_inseminacion(
                     fecha=data['fecha'],
-                    animal=data['animal'],
                     tipo_semen=data['tipo_semen'],
+                    animal=animal,
                     inseminador=data['inseminador'],
                     usuario_responsable=request.user
                 )
@@ -160,10 +163,11 @@ def inseminacion_create(request):
     return render(request, "salud/inseminacion_form.html", {"form": form})
 
 
+
 # ---------- LISTAR ----------
 @login_required
 def inseminacion_list(request):
-    registros = Inseminacion.objects.select_related("animal", "responsable").order_by('-fecha')
+    registros = Inseminacion.objects.select_related("responsable").order_by('-fecha')
     return render(request, "salud/inseminacion_list.html", {"registros": registros})
 
 
@@ -194,35 +198,68 @@ def inseminacion_delete(request, pk):
     return redirect("salud:inseminacion_list")
 
 
+@login_required
+@role_required("Gerente", "Administrador finca")
 def gestacion_pendientes(request):
-    pendientes = Inseminacion.objects.filter(confirmaciongestacion__isnull=True)
+    pendientes = GestacionService.obtener_inseminaciones_pendientes()
 
     return render(request, "salud/gestacion_pendientes.html", {
         "pendientes": pendientes
     })
 
-
+@login_required
+@role_required("Gerente", "Administrador finca")
 def confirmar_gestacion(request, id_inseminacion):
     inseminacion = get_object_or_404(Inseminacion, id=id_inseminacion)
     form = ConfirmacionGestacionForm()
 
     if request.method == "POST":
         form = ConfirmacionGestacionForm(request.POST)
+
         if form.is_valid():
-            confirm = form.save(commit=False)
-            confirm.inseminacion = inseminacion
-            confirm.save()
+            data = form.cleaned_data
 
-            # Actualización del estado del animal
-            inseminacion.animal.estado = (
-                "Gestante" if confirm.resultado == "gestante" else "No gestante"
-            )
-            inseminacion.animal.save()
+            try:
+                GestacionService.confirmar_gestacion(
+                    inseminacion=inseminacion,
+                    fecha_confirmacion=data['fecha_confirmacion'],
+                    metodo_diagnostico=data['metodo_diagnostico'],
+                    resultado=data['resultado'],
+                    responsable=data['responsable'],
+                    observaciones=data.get('observaciones')
+                )
 
-            messages.success(request, "Confirmación de gestación registrada exitosamente.")
-            return redirect("salud:gestacion_pendientes")
+                messages.success(request, "Confirmación de gestación registrada exitosamente.")
+                return redirect("salud:gestacion_pendientes")
+
+            except ValidationError as e:
+                messages.error(request, str(e))
 
     return render(request, "salud/confirmar_gestacion_form.html", {
         "form": form,
         "inseminacion": inseminacion
+    })
+
+@login_required
+@role_required("Gerente", "Administrador finca")
+def gestacion_historial(request):
+
+    historial = ConfirmacionGestacion.objects.all()
+
+    # --- FILTROS ----
+    mes = request.GET.get("mes")
+    estado = request.GET.get("estado")
+    finca = request.GET.get("finca")  # si tus animales tienen campo finca
+    
+    if mes:
+        historial = historial.filter(fecha_confirmacion__month=mes)
+
+    if estado:
+        historial = historial.filter(resultado=estado)
+
+    if finca:
+        historial = historial.filter(inseminacion__animal__finca_id=finca)
+
+    return render(request, "salud/gestacion_historial.html", {
+        "historial": historial
     })

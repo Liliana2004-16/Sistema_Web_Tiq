@@ -10,7 +10,8 @@
         {% csrf_token %}
         
         <label>Número de Arete:</label>
-        <input type="text" id="numero_arete" class="form-control mb-2">
+        <input type="text" id="numero_arete" name="numero_arete" class="form-control mb-2" required>
+
         
         <label>Nombre del Animal:</label>
         <input type="text" id="nombre_animal" class="form-control mb-2" readonly>

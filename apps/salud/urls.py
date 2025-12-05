@@ -20,7 +20,10 @@ urlpatterns = [
 
 
     # Gestación
+    # Gestación
     path('gestacion/pendientes/', views.gestacion_pendientes, name="gestacion_pendientes"),
     path('gestacion/confirmar/<int:id_inseminacion>/', views.confirmar_gestacion, name="confirmar_gestacion"),
+    path('gestacion/historial/', views.gestacion_historial, name="gestacion_historial"),
+
 
 ]

@@ -59,14 +59,10 @@ class InseminacionService:
             responsable=usuario_responsable
         )
 
-
 class GestacionService:
 
     @staticmethod
     def obtener_inseminaciones_pendientes():
-        """
-        Devuelve todas las inseminaciones sin confirmación.
-        """
         return Inseminacion.objects.filter(confirmaciongestacion__isnull=True)
 
     @staticmethod
@@ -76,11 +72,7 @@ class GestacionService:
         metodo_diagnostico, resultado,
         responsable, observaciones=None
     ):
-        """
-        Registra la confirmación de gestación y actualiza estado del animal.
-        """
 
-        # Verificar que no exista ya una confirmación
         if hasattr(inseminacion, "confirmaciongestacion"):
             raise ValidationError("Esta inseminación ya fue confirmada.")
 
@@ -93,9 +85,10 @@ class GestacionService:
             observaciones=observaciones
         )
 
-        # Actualización del estado del animal
+        # Actualización del estado reproductivo del animal
         animal = inseminacion.animal
         animal.estado = "Gestante" if resultado == "gestante" else "No gestante"
         animal.save()
 
         return confirm
+

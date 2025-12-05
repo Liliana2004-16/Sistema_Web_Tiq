@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% load static %}
+{% block content %}
 
 <h3>Historial de Confirmaciones</h3>
 
@@ -8,8 +9,8 @@
     <label class="mr-2">Mes:</label>
     <select name="mes" class="form-control mr-3">
         <option value="">Todos</option>
-        {% for i in 1|to:12 %}
-        <option value="{{ i }}">{{ i }}</option>
+        {% for i in 1|make_list %}
+        <option value="{{ forloop.counter }}">{{ forloop.counter }}</option>
         {% endfor %}
     </select>
 
@@ -49,3 +50,5 @@
         {% endfor %}
     </tbody>
 </table>
+
+{% endblock %}
