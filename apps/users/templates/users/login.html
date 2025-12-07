@@ -1,22 +1,89 @@
 {% extends "base_public.html" %}
+{% load static %}
+
+{% block title %}Iniciar Sesión | Agrotiq{% endblock %}
+
 {% block content %}
-<div style="max-width:420px;margin:60px auto">
-  <h2>Inicio de Sesión</h2>
-  <form method="post" novalidate>
-    {% csrf_token %}
-    {{ form.non_field_errors }}
-    <div>{{ form.username.label_tag }} {{ form.username }}</div>
-    <div>{{ form.password.label_tag }} {{ form.password }}</div>
-    <button type="submit">Ingresar</button>
-  </form>
-  <p> |
-    <a href="{% url 'users:recover_password' %}">¿Olvidó su contraseña?</a>
-  </p>
-  {% for message in messages %}
-    <div style="color: red;">{{ message }}</div>
-  {% endfor %}
+
+<link rel="stylesheet" href="{% static 'users/css/login.css' %}">
+
+<div class="login-wrapper">
+    <div class="login-card">
+
+        <!-- Encabezado verde con logo -->
+        <div class="login-header">
+            <div class="logo-container">
+                <img src="{% static 'users/imagenes/logo.png' %}" alt="Logo"class="login-logo" >
+            </div>
+            <h3 class="brand-name">AGROTIQUIZA</h3>
+        </div>
+
+        <!-- Contenido del formulario -->
+        <div class="login-body">
+
+            <h4 class="login-title">Iniciar Sesión</h4>
+            <p class="login-subtitle">Ingrese sus credenciales para acceder</p>
+
+            <form method="POST" id="loginForm" novalidate>
+                {% csrf_token %}
+
+                <!-- Campo Cédula -->
+                <div class="form-group">
+                    <label for="id_username" class="form-label">Cédula</label>
+                    <input type="text" 
+                           name="username" 
+                           id="id_username"
+                           class="form-control" 
+                           placeholder="Ingrese su número de cédula"
+                           pattern="[0-9]+"
+                           inputmode="numeric"
+                           required>
+                    <div class="invalid-feedback">Solo se permiten números.</div>
+                </div>
+
+                <!-- Campo Contraseña -->
+                <div class="form-group">
+                    <label for="id_password" class="form-label">Contraseña</label>
+                    <input type="password" 
+                           name="password" 
+                           id="id_password"
+                           class="form-control" 
+                           placeholder="Ingrese su contraseña"
+                           required>
+                </div>
+
+                <!-- Botón de ingreso -->
+                <button type="submit" class="btn-login">Ingresar</button>
+            </form>
+
+            <!-- Enlace de recuperación -->
+            <div class="recover-container">
+                <a href="{% url 'users:recover_password' %}" class="recover-link">
+                    ¿Olvidó su contraseña?
+                </a>
+            </div>
+
+        </div>
+
+        <!-- Footer -->
+        <div class="login-footer">
+            <small>Sistema Ganadero v1.0</small>
+        </div>
+
+    </div>
 </div>
+
+<!-- Manejo de mensajes de Django -->
+{% for message in messages %}
+<div class="django-message" data-type="{{ message.tags }}" style="display:none;">{{ message }}</div>
+{% endfor %}
+
+{% if form.non_field_errors %}
+    {% for error in form.non_field_errors %}
+        <div class="django-message" data-type="error" style="display:none;">{{ error }}</div>
+    {% endfor %}
+{% endif %}
+
+<script src="{% static 'users/js/login.js' %}"></script>
+
 {% endblock %}
-
-
-

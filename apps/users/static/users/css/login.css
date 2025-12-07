@@ -1,0 +1,215 @@
+/* Reset y configuración general */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+}
+
+/* Contenedor principal - CENTRADO VERTICAL */
+.login-wrapper {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: #f3f4f6;
+    padding: 20px;
+    position: relative;
+}
+
+/* Tarjeta de login - CENTRADA */
+.login-card {
+    width: 350px;
+    max-width: 350px;
+    background: white;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+/* Encabezado verde */
+.login-header {
+    background: #15803d;
+    padding: 35px 20px 30px;
+    text-align: center;
+}
+
+.logo-container {
+    margin-bottom: 12px;
+}
+
+
+.login-logo {
+    width: 70px;
+    height: 70px;
+    object-fit: cover;
+    background: white;
+    border-radius: 50%;
+    padding: 10px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.brand-name {
+    color: white;
+    font-size: 24px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    margin: 0;
+}
+
+/* Cuerpo del formulario */
+.login-body {
+    padding: 35px 40px 30px;
+}
+
+.login-title {
+    font-size: 22px;
+    font-weight: 600;
+    color: #1f2937;
+    text-align: center;
+    margin-bottom: 8px;
+}
+
+.login-subtitle {
+    font-size: 14px;
+    color: #6b7280;
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+/* Grupos de formulario */
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-label {
+    display: block;
+    font-size: 14px;
+    font-weight: 500;
+    color: #374151;
+    margin-bottom: 8px;
+}
+
+/* Inputs */
+.form-control {
+    width: 100%;
+    padding: 12px 14px;
+    font-size: 15px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+    background: white;
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: #15803d;
+    box-shadow: 0 0 0 3px rgba(21, 128, 61, 0.1);
+}
+
+.form-control::placeholder {
+    color: #9ca3af;
+}
+
+/* Estados de validación */
+.form-control.is-invalid {
+    border-color: #dc2626;
+}
+
+.invalid-feedback {
+    display: none;
+    color: #dc2626;
+    font-size: 13px;
+    margin-top: 6px;
+}
+
+.form-control.is-invalid ~ .invalid-feedback {
+    display: block;
+}
+
+/* Botón de ingreso */
+.btn-login {
+    width: 100%;
+    padding: 13px;
+    font-size: 16px;
+    font-weight: 600;
+    color: white;
+    background: linear-gradient(135deg, #15803d 0%, #166534 100%);
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 10px;
+}
+
+.btn-login:hover {
+    background: linear-gradient(135deg, #166534 0%, #14532d 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(21, 128, 61, 0.3);
+}
+
+.btn-login:active {
+    transform: translateY(0);
+}
+
+/* Enlace de recuperación */
+.recover-container {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.recover-link {
+    font-size: 14px;
+    color: #2563eb;
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+.recover-link:hover {
+    color: #1d4ed8;
+    text-decoration: underline;
+}
+
+/* Footer */
+.login-footer {
+    background: #f9fafb;
+    padding: 15px 20px;
+    text-align: center;
+    border-top: 1px solid #e5e7eb;
+}
+
+.login-footer small {
+    font-size: 12px;
+    color: #6b7280;
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+    .login-card {
+        max-width: 100%;
+    }
+    
+    .login-body {
+        padding: 25px 25px 20px;
+    }
+    
+    .login-title {
+        font-size: 20px;
+    }
+    
+    .login-subtitle {
+        font-size: 13px;
+    }
+}
+
+/* Copyright footer externo */
+.copyright-footer {
+    text-align: center;
+    color: #6b7280;
+    font-size: 13px;
+    margin-top: 30px;
+    padding: 20px;
+}

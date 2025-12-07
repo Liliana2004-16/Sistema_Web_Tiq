@@ -1,15 +1,17 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
-
+from django.contrib.auth.decorators import login_required
+from apps.users.decorators import role_required
 from .services import FincaService
 from .forms import FincaForm
 
 service = FincaService()
 
+@login_required
 def finca_list(request):
     fincas = service.listar_fincas()
     return render(request, 'finca/list.html', {'fincas': fincas})
-
+@login_required
 def finca_create(request):
     if request.method == 'POST':
         form = FincaForm(request.POST)
@@ -35,7 +37,8 @@ def finca_update(request, id):
         form = FincaForm(instance=finca)
 
     return render(request, 'finca/form.html', {'form': form, 'titulo': 'Editar Finca'})
-
+    
+@login_required
 def finca_delete(request, id):
     finca = get_object_or_404(service.listar_fincas(), id=id)
 

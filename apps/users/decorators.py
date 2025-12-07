@@ -6,7 +6,7 @@ def role_required(*roles_permitidos):
     """
     Decorador para restringir vistas por rol.
     Uso:
-        @role_required("Gerente", "Administrador Finca")
+        @role_required("Gerente", "Administrador Finca", )
     """
     def decorator(view_func):
         @wraps(view_func)

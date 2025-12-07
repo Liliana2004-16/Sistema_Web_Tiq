@@ -1,67 +1,197 @@
 {% extends "base.html" %}
+{% load static %}
+
+{% block title %}Panel Principal - Agrotiquiza{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+<style>
+    /* Estilos inline como respaldo por si el CSS no carga */
+    .dashboard { max-width: 1400px; margin: 0 auto; padding: 20px; }
+    .dashboard-img { width: 100%; height: 220px; object-fit: cover; border-radius: 12px; }
+</style>
+{% endblock %}
+
 {% block content %}
 
-<div style="padding: 40px;">
+<div class="dashboard">
 
-  <ul>
+    <!-- Encabezado con imágenes tipo carrusel -->
+    <div class="row mb-4">
+        <div class="col-md-4 mb-3 mb-md-0">
+            <img src="{% static 'images/vaca1.jpg' %}" class="dashboard-img" alt="Ganado 1" onerror="this.style.display='none'">
+        </div>
+        <div class="col-md-4 mb-3 mb-md-0">
+            <img src="{% static 'images/vaca2.jpg' %}" class="dashboard-img" alt="Ganado 2" onerror="this.style.display='none'">
+        </div>
+        <div class="col-md-4">
+            <img src="{% static 'images/vaca3.jpg' %}" class="dashboard-img" alt="Ganado 3" onerror="this.style.display='none'">
+        </div>
+    </div>
 
-    <!-- MÓDULO ADMINISTRACIÓN -->
-    {% if user.rol.nombre_rol == "Gerente" %}
-    <li>
-      <details>
-        <summary>Módulo Administración</summary>
-        <ul>
-          <li><a href="{% url 'users:users_list' %}">Gestión de Usuarios</a></li>
-          <li><a href="{% url 'users:register' %}">Registrar Usuario</a></li>
-        </ul>
-      </details>
-    </li>
-    {% endif %}
+    <!-- Indicadores principales -->
+    <h3 class="mb-4 fw-bold text-center text-md-start">Bienvenido a Agrotiquiza</h3>
 
-    <!-- MÓDULO GESTIÓN ANIMAL -->
-    <li>
-      <details>
-        <summary>Gestión Animal</summary>
-        <ul>
+    <div class="row text-center mb-5">
 
-          <!-- LISTA DE ANIMALES (equivalente a identificación) -->
-          <li><a href="{% url 'ganaderia:animales_list' %}">Identificación de Animales</a></li>
+        <div class="col-md-4 mb-3 mb-md-0">
+            <div class="card resumen-card blue">
+                <p class="card-title-mini mb-2">Total de Animales</p>
+                <h2 class="mb-0">{{ total_animales|default:0 }}</h2>
+            </div>
+        </div>
 
-          <!-- PARTOS -->
-          <li><a href="{% url 'ganaderia:partos_list' %}">Registrar Partos</a></li>
+        <div class="col-md-4 mb-3 mb-md-0">
+            <div class="card resumen-card green">
+                <p class="card-title-mini mb-2">Fincas Activas</p>
+                <h2 class="mb-0">{{ total_fincas|default:0 }}</h2>
+            </div>
+        </div>
 
+        <div class="col-md-4">
+            <div class="card resumen-card orange">
+                <p class="card-title-mini mb-2">Producción Diaria</p>
+                <h2 class="mb-0">{{ produccion_diaria|floatformat:0|default:0 }} L</h2>
+            </div>
+        </div>
+    </div>
 
-     
+    <!-- BLOQUES COLORIDOS -->
+    <h4 class="fw-bold mb-4">Resumen General de Operaciones</h4>
 
-          <!-- PRODUCCIÓN DE LECHE -->
-          <li><a href="{% url 'ganaderia:registrar_produccion' %}">Producción de Leche</a></li>
+    <div class="row">
 
-          <!-- TRASLADOS -->
-          <li><a href="{% url 'ganaderia:traslados' %}">Traslados</a></li>
+        <!-- ESTADO DEL GANADO -->
+        <div class="col-lg-4 col-md-6 mb-4">
+            <div class="block-card blue">
+                <h6><i class="fas fa-cow me-2"></i>Estado del Ganado</h6>
+                <button class="toggle-btn" data-target="#estadoGanado" aria-label="Expandir/Colapsar" type="button">▼</button>
 
-          <li><a href="{% url 'finca:create' %}">Registrar Finca</a></li>
+                <div id="estadoGanado" class="block-content">
+                    <p><strong>Ventas:</strong> {{ ventas|default:0 }}</p>
+                    <p><strong>Muertes:</strong> {{ muertes|default:0 }}</p>
+                    <p><strong>Descartes:</strong> {{ descartes|default:0 }}</p>
+                    <p><strong>Traslados:</strong> {{ traslados|default:0 }}</p>
 
-        </ul>
-      </details>
-    </li>
+                    <a href="{% url 'ganaderia:eventos_salida_list' %}" class="btn btn-light btn-sm w-100 mt-3">
+                        <i class="fas fa-arrow-right me-1"></i> Ver Más
+                    </a>
+                </div>
+            </div>
+        </div>
 
-    <!-- MÓDULO SALUD -->
-    <li>
-      <details>
-        <summary>Salud Animal</summary>
-        <ul>
-          <li><a href=>Eventos Sanitarios</a></li>
-          <li><a href=>Inseminación</a></li>
-          <li><a href=>Confirmación de Gestación</a></li>
-        </ul>
-      </details>
-    </li>
+        <!-- GANADO POR FINCA -->
+        <div class="col-lg-4 col-md-6 mb-4">
+            <div class="block-card green">
+                <h6><i class="fas fa-home me-2"></i>Ganado por Finca</h6>
+                <button class="toggle-btn" data-target="#ganadoFinca" aria-label="Expandir/Colapsar" type="button">▼</button>
 
+                <div id="ganadoFinca" class="block-content">
+                    {% if ganado_por_finca %}
+                        {% for f in ganado_por_finca %}
+                            <p><strong>{{ f.finca__nombre }}:</strong> {{ f.total }} animales</p>
+                        {% endfor %}
+                    {% else %}
+                        <p class="text-muted small">No hay datos disponibles</p>
+                    {% endif %}
 
-  </ul>
+                    <a href="{% url 'ganaderia:animales_list' %}" class="btn btn-light btn-sm w-100 mt-3">
+                        <i class="fas fa-arrow-right me-1"></i> Ver Más
+                    </a>
+                </div>
+            </div>
+        </div>
 
+        <!-- FINCAS REGISTRADAS -->
+        <div class="col-lg-4 col-md-6 mb-4">
+            <div class="block-card purple">
+                <h6><i class="fas fa-map-marker-alt me-2"></i>Fincas Registradas</h6>
+                <button class="toggle-btn" data-target="#fincasReg" aria-label="Expandir/Colapsar" type="button">▼</button>
+
+                <div id="fincasReg" class="block-content">
+                    <p><strong>Total:</strong> {{ total_fincas|default:0 }}</p>
+                    <p><strong>Partos registrados:</strong> {{ total_partos|default:0 }}</p>
+
+                    <a href="{% url 'finca:list' %}" class="btn btn-light btn-sm w-100 mt-3">
+                        <i class="fas fa-arrow-right me-1"></i> Ver Más
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- PRODUCCIÓN DE LECHE -->
+        <div class="col-lg-4 col-md-6 mb-4">
+            <div class="block-card yellow">
+                <h6><i class="fas fa-wine-bottle me-2"></i>Producción de Leche</h6>
+                <button class="toggle-btn" data-target="#prodLeche" aria-label="Expandir/Colapsar" type="button">▼</button>
+
+                <div id="prodLeche" class="block-content">
+                    {% if produccion_por_finca %}
+                        {% for p in produccion_por_finca %}
+                            <p><strong>{{ p.nombre }}:</strong> {{ p.promedio|floatformat:2 }} L</p>
+                        {% endfor %}
+                    {% else %}
+                        <p class="text-muted small">No hay datos de producción</p>
+                    {% endif %}
+
+                    <a href="{% url 'ganaderia:registrar_produccion' %}" class="btn btn-light btn-sm w-100 mt-3">
+                        <i class="fas fa-arrow-right me-1"></i> Ver Más
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- SALUD ANIMAL -->
+        <div class="col-lg-4 col-md-6 mb-4">
+            <div class="block-card red">
+                <h6><i class="fas fa-heartbeat me-2"></i>Eventos de Salud</h6>
+                <button class="toggle-btn" data-target="#saludEventos" aria-label="Expandir/Colapsar" type="button">▼</button>
+
+                <div id="saludEventos" class="block-content">
+                    <p><strong>Total:</strong> {{ eventos_salud_total|default:0 }}</p>
+                    
+                    {% if eventos_salud_por_finca %}
+                        {% for e in eventos_salud_por_finca %}
+                            <p><strong>{{ e.animal__finca__nombre }}:</strong> {{ e.total }} eventos</p>
+                        {% endfor %}
+                    {% endif %}
+
+                    <a href="{% url 'salud:evento_sanitario_list' %}" class="btn btn-light btn-sm w-100 mt-3">
+                        <i class="fas fa-arrow-right me-1"></i> Ver Más
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- INSEMINACIONES -->
+        <div class="col-lg-4 col-md-6 mb-4">
+            <div class="block-card aqua">
+                <h6><i class="fas fa-syringe me-2"></i>Inseminaciones</h6>
+                <button class="toggle-btn" data-target="#inseminaciones" aria-label="Expandir/Colapsar" type="button">▼</button>
+
+                <div id="inseminaciones" class="block-content">
+                    <p><strong>Total:</strong> {{ total_inseminaciones|default:0 }}</p>
+                    <p><strong>Gestantes confirmadas:</strong> {{ gestantes|default:0 }}</p>
+                    <p><strong>Pendientes confirmar:</strong> {{ pendientes_confirmar|default:0 }}</p>
+
+                    <a href="{% url 'salud:inseminacion_list' %}" class="btn btn-light btn-sm w-100 mt-3">
+                        <i class="fas fa-arrow-right me-1"></i> Ver Más
+                    </a>
+                </div>
+            </div>
+        </div>
+
+    </div>
 
 </div>
 
 {% endblock %}
 
+{% block extra_js %}
+<script src="{% static 'js/dashboard.js' %}"></script>
+<script>
+    // Log para verificar que el JS se cargó
+    console.log('Dashboard HTML cargado');
+    console.log('Static URL:', '{% static "css/dashboard.css" %}');
+</script>
+{% endblock %}

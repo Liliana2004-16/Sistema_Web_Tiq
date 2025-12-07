@@ -1,0 +1,116 @@
+/* ================================
+   AGROTIQUIZA – ESTILOS GLOBALES
+   Compatible con Bootstrap 5
+================================ */
+
+/* --- Colores base --- */
+:root {
+    --agro-primary: #2E7D32;
+    --agro-primary-light: #66BB6A;
+    --agro-secondary: #F9A825;
+    --agro-danger: #E53935;
+    --agro-gray: #F5F5F5;
+    --agro-text-gray: #616161;
+}
+
+/* --- Body general --- */
+body {
+    background-color: var(--agro-gray) !important;
+    font-family: "Segoe UI", Tahoma, sans-serif;
+    color: #333;
+}
+
+/* --- Navbar --- */
+.navbar {
+    background-color: var(--agro-primary) !important;
+}
+
+.navbar .nav-link,
+.navbar-brand {
+    color: #fff !important;
+    font-weight: 500;
+}
+
+.navbar .nav-link:hover {
+    color: var(--agro-secondary) !important;
+}
+
+.navbar .dropdown-menu {
+    border-radius: 8px;
+}
+
+/* --- Cards globales --- */
+.card {
+    border-radius: 10px !important;
+}
+
+.card-body h6 {
+    color: var(--agro-text-gray);
+}
+
+/* --- Tablas --- */
+.table thead {
+    background-color: var(--agro-primary-light) !important;
+    color: #fff;
+}
+
+.table-hover tbody tr:hover {
+    background-color: #e9f5ea;
+}
+
+/* --- Botones personalizados --- */
+.btn-success {
+    background-color: var(--agro-primary) !important;
+    border-color: var(--agro-primary) !important;
+}
+
+.btn-success:hover {
+    background-color: var(--agro-primary-light) !important;
+}
+
+.btn-warning {
+    background-color: var(--agro-secondary) !important;
+    border-color: var(--agro-secondary) !important;
+}
+
+.btn-danger {
+    background-color: var(--agro-danger) !important;
+}
+
+/* --- Inputs --- */
+.form-control:focus,
+.form-select:focus {
+    border-color: var(--agro-primary);
+    box-shadow: 0 0 0 0.15rem rgba(46, 125, 50, 0.25);
+}
+
+/* --- Badges personalizados --- */
+.badge.bg-success {
+    background-color: var(--agro-primary) !important;
+}
+
+.badge.bg-warning {
+    background-color: var(--agro-secondary) !important;
+}
+
+/* --- Custom alerts --- */
+.alert-success {
+    background-color: #d9f2dd !important;
+    color: var(--agro-primary) !important;
+    border-left: 5px solid var(--agro-primary);
+}
+
+.alert-danger {
+    border-left: 5px solid var(--agro-danger);
+}
+
+/* --- Tablas vacías --- */
+.empty-row {
+    color: var(--agro-text-gray);
+    font-style: italic;
+}
+
+/* --- Sombra suave global --- */
+.shadow-sm {
+    box-shadow: 0px 2px 8px rgba(0,0,0,0.08) !important;
+}

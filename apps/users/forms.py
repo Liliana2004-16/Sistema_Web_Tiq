@@ -3,6 +3,8 @@
 from django import forms
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm, SetPasswordForm
 from .models import User, Empresa
+from django.contrib.auth.forms import PasswordChangeForm
+from django.contrib.auth.forms import AuthenticationForm
 from django.core.exceptions import ValidationError
 import re
 
@@ -11,6 +13,12 @@ import re
 # LOGIN
 # ============================================================
 class LoginForm(AuthenticationForm):
+    # Mensaje de error personalizado
+    error_messages = {
+        'invalid_login': "Cédula o contraseña incorrecta.",
+        'inactive': "Usuario inactivo. Contacte al administrador.",
+    }
+
     username = forms.CharField(
         label="Cédula",
         widget=forms.TextInput(attrs={
@@ -21,9 +29,13 @@ class LoginForm(AuthenticationForm):
         }),
         max_length=20
     )
+
     password = forms.CharField(
         label="Contraseña",
-        widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Contraseña'}),
+        widget=forms.PasswordInput(attrs={
+            'class': 'form-control', 
+            'placeholder': 'Contraseña'
+        }),
     )
 
     def clean_username(self):
@@ -32,28 +44,25 @@ class LoginForm(AuthenticationForm):
             raise ValidationError('La cédula debe contener solo números.')
         return ced
 
-
+    def confirm_login_allowed(self, user):
+        """
+        Controla si un usuario puede iniciar sesión.
+        Se ejecuta después de validar las credenciales.
+        """
+        if not user.is_active:
+            raise ValidationError(
+                self.error_messages['inactive'],
+                code='inactive',
+            )
 # ============================================================
-# REGISTRO DE USUARIOS
+# REGISTRO DE USUARIOS (CORREGIDO)
 # ============================================================
-class UserRegisterForm(UserCreationForm):
+class UserRegisterForm(forms.ModelForm):
 
     empresa = forms.ModelChoiceField(
         queryset=Empresa.objects.all(),
         required=False,
         label="Empresa"
-    )
-
-    # Sobrescribimos los campos de contraseña para traducirlos
-    password1 = forms.CharField(
-        label="Contraseña",
-        widget=forms.PasswordInput,
-        help_text="Debe contener al menos 8 caracteres y no ser demasiado común."
-    )
-    password2 = forms.CharField(
-        label="Confirmar contraseña",
-        widget=forms.PasswordInput,
-        help_text="Repita la contraseña para verificación."
     )
 
     class Meta:
@@ -78,6 +87,8 @@ class UserRegisterForm(UserCreationForm):
         ced = self.cleaned_data.get('cedula')
         if not ced or not ced.isdigit():
             raise ValidationError("La cédula solo debe contener números.")
+        if User.objects.filter(cedula=ced).exists():
+            raise ValidationError("La cédula ya está registrada.")
         return ced
 
     # Validación de correo
@@ -86,21 +97,6 @@ class UserRegisterForm(UserCreationForm):
         if User.objects.filter(email=email).exists():
             raise ValidationError("El correo ya está registrado.")
         return email
-
-    # Validación general
-    def clean(self):
-        cleaned = super().clean()
-        ced = cleaned.get('cedula')
-
-        if ced and User.objects.filter(cedula=ced).exists():
-            raise ValidationError("La cédula ya está registrada.")
-
-        return cleaned
-
-
-# ============================================================
-# RECUPERACIÓN DE CONTRASEÑA
-# ============================================================
 class RecoverPasswordForm(forms.Form):
     cedula = forms.CharField(
         label='Cédula',
@@ -116,9 +112,21 @@ class RecoverPasswordForm(forms.Form):
             raise ValidationError('No existe un usuario con esa cédula.')
         return ced
 
+class CustomPasswordChangeForm(PasswordChangeForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
 
-# ============================================================
-# CAMBIO OBLIGATORIO DE CONTRASEÑA
-# ============================================================
-class ForceChangePasswordForm(SetPasswordForm):
-    pass
+        self.fields['old_password'].label = "Contraseña actual"
+        self.fields['new_password1'].label = "Nueva contraseña"
+        self.fields['new_password2'].label = "Confirmar nueva contraseña"
+
+        # Mensajes en español
+        self.fields['new_password1'].help_text = (
+            "<ul>"
+            "<li>La contraseña no puede ser similar a su información personal.</li>"
+            "<li>Debe contener al menos 8 caracteres.</li>"
+            "<li>No debe ser una contraseña común.</li>"
+            "<li>No puede ser completamente numérica.</li>"
+            "</ul>"
+        )
+
