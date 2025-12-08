@@ -1,27 +1,212 @@
 {% extends "base.html" %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'ganaderia/css/animal_detail.css' %}">
+{% endblock %}
+
 {% block content %}
-<div class="container mt-4">
-  <h3>Animal {{ animal.numero_arete }} - {{ animal.nombre }}</h3>
-  <p>Raza: {{ animal.raza }} | Sexo: {{ animal.get_sexo_display }} | Finca: {{ animal.finca.nombre }} | Estado: {{ animal.estado }}</p>
-  <p>Fecha nacimiento: {{ animal.fecha_nacimiento }} | Días: {{ animal.edad_dias }}</p>
+<div class="container mt-4 mb-5">
+  
+  <!-- Header del Animal -->
+  <div class="animal-header">
+    <div class="d-flex justify-content-between align-items-start">
+      <div>
+        <h2>{{ animal.nombre|default:"Sin nombre" }}</h2>
+        <div class="subtitle">
+          Arete: <strong>{{ animal.numero_arete }}</strong> | 
+          Finca: <strong>{{ animal.finca.nombre }}</strong>
+        </div>
+      </div>
+      <div>
+        <span class="badge-estado badge-{{ animal.estado|lower }}">
+          {{ animal.get_estado_display|default:animal.estado }}
+        </span>
+      </div>
+    </div>
+  </div>
 
-  <h5>Último pesaje</h5>
-  {% with pesaje=animal.latest_pesaje %}
-    {% if pesaje %}
-      <p>{{ pesaje.peso }} kg - {{ pesaje.fecha }}</p>
+  <!-- Estadísticas rápidas -->
+  <div class="stats-row">
+    <div class="stat-box">
+      <span class="number">{{ animal.edad_dias|default:0 }}</span>
+      <span class="label">Días de edad</span>
+    </div>
+    <div class="stat-box">
+      <span class="number">{{ animal.pesajes.count }}</span>
+      <span class="label">Pesajes</span>
+    </div>
+    <div class="stat-box">
+      <span class="number">{{ animal.partos_como_madre.count }}</span>
+      <span class="label">Partos</span>
+    </div>
+    <div class="stat-box">
+      <span class="number">
+        {% if animal.latest_pesaje %}
+          {{ animal.latest_pesaje.peso|floatformat:0 }}
+        {% else %}
+          -
+        {% endif %}
+      </span>
+      <span class="label">Peso actual (kg)</span>
+    </div>
+  </div>
+
+  <!-- Información General -->
+  <div class="info-card">
+    <h5>Información General</h5>
+    <div class="info-grid">
+      <div class="info-item">
+        <label>Fecha de Nacimiento</label>
+        <div class="value">{{ animal.fecha_nacimiento|date:"d/m/Y"|default:"No registrada" }}</div>
+      </div>
+      <div class="info-item">
+        <label>Raza</label>
+        <div class="value">{{ animal.raza|default:"No especificada" }}</div>
+      </div>
+      <div class="info-item">
+        <label>Sexo</label>
+        <div class="value">{{ animal.get_sexo_display|default:animal.sexo }}</div>
+      </div>
+      <div class="info-item">
+        <label>Madre</label>
+        <div class="value">
+          {% if animal.madre %}
+            <a href="{% url 'ganaderia:animal_detail' animal.madre.pk %}">
+              {{ animal.madre.numero_arete }}
+            </a>
+          {% else %}
+            No registrada
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Últimos Pesajes -->
+  <div class="info-card">
+    <h5>Historial de Pesajes</h5>
+    {% if animal.pesajes.all %}
+      <table>
+        <thead>
+          <tr>
+            <th>Fecha</th>
+            <th>Peso (kg)</th>
+            <th>Finca</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for pesaje in animal.pesajes.all|slice:":10" %}
+            <tr>
+              <td>{{ pesaje.fecha|date:"d/m/Y" }}</td>
+              <td><strong>{{ pesaje.peso|floatformat:1 }} kg</strong></td>
+              <td>{{ pesaje.finca.nombre }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% if animal.pesajes.count > 10 %}
+        <p class="text-muted mt-2 text-center">
+          <small>Mostrando los últimos 10 de {{ animal.pesajes.count }} pesajes</small>
+        </p>
+      {% endif %}
     {% else %}
-      <p>No hay pesajes registrados</p>
+      <div class="no-data">
+        No hay pesajes registrados para este animal
+      </div>
     {% endif %}
-  {% endwith %}
+  </div>
 
-  <h5>Partos</h5>
-  <ul>
-    {% for p in animal.partos.all %}
-      <li>{{ p.fecha_nacimiento }} - Cría: {{ p.cria }}</li>
-    {% empty %}
-      <li>No hay partos registrados</li>
+  <!-- Historial de Partos (solo si es hembra) -->
+  {% if animal.sexo == "F" or "emb" in animal.sexo|lower %}
+  <div class="info-card">
+    <h5>Historial de Partos</h5>
+    {% if animal.partos_como_madre.all %}
+      <div class="timeline">
+        {% for parto in animal.partos_como_madre.all %}
+          <div class="timeline-item">
+            <div class="timeline-date">
+              {{ parto.fecha_nacimiento|date:"d/m/Y" }}
+            </div>
+            <div class="timeline-content">
+              <strong>Cría:</strong> 
+              {% if parto.cria %}
+                <a href="{% url 'ganaderia:animal_detail' parto.cria.pk %}">
+                  {{ parto.cria.numero_arete }} - {{ parto.cria.nombre }}
+                </a>
+              {% else %}
+                No registrada
+              {% endif %}
+              <br>
+              <strong>Sexo:</strong> {{ parto.sexo }}
+              {% if parto.peso %}
+                | <strong>Peso al nacer:</strong> {{ parto.peso|floatformat:1 }} kg
+              {% endif %}
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="no-data">
+        No hay partos registrados para esta madre
+      </div>
+    {% endif %}
+  </div>
+  {% endif %}
+
+  <!-- Producción de Leche (solo si aplica) -->
+  {% if animal.produccion_leche.all %}
+  <div class="info-card">
+    <h5>Producción de Leche</h5>
+    <table>
+      <thead>
+        <tr>
+          <th>Fecha</th>
+          <th>AM (kg)</th>
+          <th>PM (kg)</th>
+          <th>Total Diario (kg)</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for prod in animal.produccion_leche.all|slice:":10" %}
+          <tr>
+            <td>{{ prod.fecha|date:"d/m/Y" }}</td>
+            <td>{{ prod.peso_am|default:"-"|floatformat:1 }}</td>
+            <td>{{ prod.peso_pm|default:"-"|floatformat:1 }}</td>
+            <td><strong>{{ prod.total_diario|floatformat:1 }}</strong></td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% if animal.produccion_leche.count > 10 %}
+      <p class="text-muted mt-2 text-center">
+        <small>Mostrando los últimos 10 de {{ animal.produccion_leche.count }} registros</small>
+      </p>
+    {% endif %}
+  </div>
+  {% endif %}
+
+  <!-- Eventos de Salida -->
+  {% if animal.eventos_salida.all %}
+  <div class="info-card">
+    <h5>Eventos de Salida</h5>
+    {% for evento in animal.eventos_salida.all %}
+      <div class="alert alert-warning">
+        <strong>{{ evento.get_tipo_evento_display }}:</strong> {{ evento.fecha|date:"d/m/Y" }}
+        {% if evento.observaciones %}
+          <br><small>{{ evento.observaciones }}</small>
+        {% endif %}
+      </div>
     {% endfor %}
-  </ul>
+  </div>
+  {% endif %}
+
+  <!-- Botón volver -->
+  <div class="text-center mt-4">
+    <a href="{% url 'ganaderia:animales_list' %}" class="btn-back">
+      ← Volver al listado
+    </a>
+  </div>
+
 </div>
-<a href="{% url 'ganaderia:animales_list' %}">Volver</a>
 {% endblock %}

@@ -66,6 +66,13 @@ class DashboardView(View):
             )
         )
 
+    # Agregar esto 
+        total_animales = Animal.objects.count()
+
+        produccion_diaria = ProduccionLeche.objects.aggregate(
+            total=Sum(F("peso_am") + F("peso_pm"))
+        )["total"] or 0
+
         # -------------------------------------------------
         # 6. Eventos sanitarios
         # -------------------------------------------------

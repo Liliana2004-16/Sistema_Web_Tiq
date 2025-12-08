@@ -1,12 +1,83 @@
 {% extends "base.html" %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'finca/css/forms.css' %}">
+{% endblock %}
+
 {% block content %}
-<h2>{{ titulo }}</h2>
+<div class="container mt-4 mb-5">
+  <div class="form-container">
+    
+    <!-- Header -->
+    <div class="form-header">
+      <h2>{{ titulo }}</h2>
+    </div>
 
-<form method="POST">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Guardar</button>
-</form>
+    <!-- Formulario -->
+    <div class="form-body">
+      <form method="POST" novalidate>
+        {% csrf_token %}
 
-<a href="{% url 'finca:list' %}">Volver</a>
+        {% for field in form %}
+          <div class="form-group">
+            <label for="{{ field.id_for_label }}" {% if field.field.required %}class="required-field"{% endif %}>
+              <span class="form-icon">
+                {% if 'nombre' in field.name %}
+                  
+                {% elif 'codigo' in field.name %}
+                  
+                {% elif 'ubicacion' in field.name %}
+                  
+                {% elif 'propietario' in field.name %}
+                  
+                {% else %}
+                  
+                {% endif %}
+              </span>
+              {{ field.label }}
+            </label>
+            
+            {{ field }}
+            
+            {% if field.help_text %}
+              <div class="form-help">{{ field.help_text }}</div>
+            {% endif %}
+            
+            {% if field.errors %}
+              <ul class="errorlist">
+                {% for error in field.errors %}
+                  <li>{{ error }}</li>
+                {% endfor %}
+              </ul>
+            {% endif %}
+          </div>
+        {% endfor %}
+
+        <!-- Botones de acción -->
+        <div class="form-actions">
+          <a href="{% url 'finca:list' %}" class="btn btn-secondary">
+            ← Cancelar
+          </a>
+          <button type="submit" class="btn btn-primary">
+            Guardar Finca
+          </button>
+        </div>
+      </form>
+    </div>
+
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  // Auto-enfoque en el primer campo
+  document.addEventListener('DOMContentLoaded', function() {
+    const firstInput = document.querySelector('input:not([type="hidden"]), textarea, select');
+    if (firstInput) {
+      firstInput.focus();
+    }
+  });
+</script>
 {% endblock %}

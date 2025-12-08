@@ -1,30 +1,73 @@
 {% extends "base.html" %}
-{% block content %}
-<h2>Fincas</h2>
+{% load static %}
 
-<a href="{% url 'finca:create' %}">Nueva Finca</a>
-
-<table border="1">
-    <tr>
-        <th>Nombre</th>
-        <th>Código</th>
-        <th>Ubicación</th>
-        <th>Propietario</th>
-        <th></th>
-    </tr>
-
-    {% for finca in fincas %}
-    <tr>
-        <td>{{ finca.nombre }}</td>
-        <td>{{ finca.codigo }}</td>
-        <td>{{ finca.ubicacion }}</td>
-        <td>{{ finca.propietario }}</td>
-        <td>
-            <a href="{% url 'finca:update' finca.id %}">Editar</a> |
-            <a href="{% url 'finca:delete' finca.id %}">Eliminar</a>
-        </td>
-    </tr>
-    {% endfor %}
-</table>
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'finca/css/list.css' %}">
 {% endblock %}
 
+{% block content %}
+<div class="container mt-4 mb-5">
+  
+  <!-- Header -->
+  <div class="fincas-header">
+    <div class="d-flex justify-content-between align-items-center">
+      <h2>Listado de Fincas</h2>
+      <a href="{% url 'finca:create' %}" class="btn-nueva-finca">
+        <span></span> Registrar Finca
+      </a>
+    </div>
+  </div>
+
+  <!-- Estadísticas -->
+  <div class="stats-container">
+    <div class="stat-card">
+      <span class="stat-number">{{ fincas|length }}</span>
+      <div class="stat-label">Total de Fincas</div>
+    </div>
+  </div>
+
+  <!-- Grid de Fincas -->
+  {% if fincas %}
+    <div class="fincas-grid">
+      {% for finca in fincas %}
+        <div class="finca-card">
+          <div class="finca-card-header">
+            <h3 class="finca-nombre">{{ finca.nombre }}</h3>
+            <span class="finca-codigo">{{ finca.codigo }}</span>
+          </div>
+
+          <div class="finca-info">
+            <div class="info-row">
+              <span class="icon"></span>
+              <span>{{ finca.ubicacion|default:"Ubicación no especificada" }}</span>
+            </div>
+            <div class="info-row">
+              <span class="icon"></span>
+              <span>{{ finca.propietario|default:"Propietario no especificado" }}</span>
+            </div>
+          </div>
+
+          <div class="finca-actions">
+            <a href="{% url 'finca:update' finca.id %}" class="btn-action btn-editar">
+              Editar
+            </a>
+            <a href="{% url 'finca:delete' finca.id %}" class="btn-action btn-eliminar">
+              Eliminar
+            </a>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="no-fincas">
+      <div class="no-fincas-icon"></div>
+      <h3>No hay fincas registradas</h3>
+      <p class="text-muted">Comienza agregando tu primera finca</p>
+      <a href="{% url 'finca:create' %}" class="btn-nueva-finca mt-3">
+         Registrar Primera Finca
+      </a>
+    </div>
+  {% endif %}
+
+</div>
+{% endblock %}

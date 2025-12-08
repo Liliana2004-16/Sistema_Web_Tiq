@@ -1,14 +1,150 @@
 {% extends "base.html" %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'users/css/register.css' %}">
+{% endblock %}
+
 {% block content %}
-<div style="max-width:640px;margin:40px auto">
-  <h2>Registrar Usuario</h2>
-  <form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Crear usuario</button>
-  </form>
-  {% for message in messages %}
-    <div>{{ message }}</div>
-  {% endfor %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-6 col-md-8">
+            <!-- Card Principal -->
+            <div class="card shadow-lg border-0 rounded-3">
+                <div class="card-body p-4">
+                    <!-- Header -->
+                    <div class="text-center mb-4">
+                        <div class="icon-circle mx-auto mb-3">
+                            <i class="bi bi-person-plus-fill"></i>
+                        </div>
+                        <h3 class="card-title text-success fw-bold">Registro de Usuario</h3>
+                    </div>
+
+                  <!-- Mensajes -->
+                  {% if messages %}
+                      {% for message in messages %}
+                          <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                              {% if message.tags == 'success' %}
+                                  <i class="bi bi-check-circle-fill me-2"></i>
+                              {% elif message.tags == 'error' %}
+                                  <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                              {% elif message.tags == 'warning' %}
+                                  <i class="bi bi-exclamation-circle-fill me-2"></i>
+                              {% else %}
+                                  <i class="bi bi-info-circle-fill me-2"></i>
+                              {% endif %}
+                              {{ message }}
+                              <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                          </div>
+                      {% endfor %}
+                  {% endif %}
+
+                    <!-- Formulario -->
+                    <form method="post" id="registerForm" novalidate>
+                        {% csrf_token %}
+                        
+                        <!-- Nombre -->
+                        <div class="mb-3">
+                            <label for="{{ form.first_name.id_for_label }}" class="form-label fw-semibold">
+                                <i class="bi bi-person me-1"></i>{{ form.first_name.label }}
+                            </label>
+                            {{ form.first_name }}
+                            {% if form.first_name.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.first_name.errors.0 }}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Apellido -->
+                        <div class="mb-3">
+                            <label for="{{ form.last_name.id_for_label }}" class="form-label fw-semibold">
+                                <i class="bi bi-person me-1"></i>{{ form.last_name.label }}
+                            </label>
+                            {{ form.last_name }}
+                            {% if form.last_name.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.last_name.errors.0 }}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Cédula -->
+                        <div class="mb-3">
+                            <label for="{{ form.cedula.id_for_label }}" class="form-label fw-semibold">
+                                <i class="bi bi-credit-card me-1"></i>{{ form.cedula.label }}
+                            </label>
+                            {{ form.cedula }}
+                            <div class="form-text">Ingrese número de cédula</div>
+                            {% if form.cedula.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.cedula.errors.0 }}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Correo -->
+                        <div class="mb-3">
+                            <label for="{{ form.email.id_for_label }}" class="form-label fw-semibold">
+                                <i class="bi bi-envelope me-1"></i>{{ form.email.label }}
+                            </label>
+                            {{ form.email }}
+                            {% if form.email.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.email.errors.0 }}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Empresa -->
+                        <div class="mb-3">
+                            <label for="{{ form.empresa.id_for_label }}" class="form-label fw-semibold">
+                                <i class="bi bi-building me-1"></i>{{ form.empresa.label }}
+                            </label>
+                            {{ form.empresa }}
+                            {% if form.empresa.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.empresa.errors.0 }}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Rol -->
+                        <div class="mb-3">
+                            <label for="{{ form.rol.id_for_label }}" class="form-label fw-semibold">
+                                <i class="bi bi-shield-check me-1"></i>{{ form.rol.label }}
+                            </label>
+                            {{ form.rol }}
+                            {% if form.rol.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.rol.errors.0 }}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Contraseña (Info) -->
+                        <div class="alert alert-info border-0 mb-4">
+                            <i class="bi bi-info-circle-fill me-2"></i>
+                            <small>Se generará una contraseña temporal que será enviada al correo del usuario.</small>
+                        </div>
+
+                        <!-- Botones -->
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+                            <a href="{% url 'users:users_list' %}" class="btn btn-secondary px-4">
+                                <i class="bi bi-x-circle me-1"></i>Cancelar
+                            </a>
+                            <button type="submit" class="btn btn-success px-4">
+                                <i class="bi bi-check-circle me-1"></i>Registrar
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'users/js/register.js' %}"></script>
 {% endblock %}

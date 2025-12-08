@@ -49,3 +49,19 @@ document.addEventListener("DOMContentLoaded", function () {
         msg.remove();
     });
 });
+
+function showToast(text, tipo = "info") {
+    const container = document.getElementById("toast-container");
+    if (!container) return;
+
+    const toast = document.createElement("div");
+    toast.classList.add("toast", `toast-${tipo}`);
+    toast.textContent = text;
+
+    container.appendChild(toast);
+
+    setTimeout(() => toast.remove(), 4000);
+}
+
+// Exportar función para uso global
+window.showToast = showToast;

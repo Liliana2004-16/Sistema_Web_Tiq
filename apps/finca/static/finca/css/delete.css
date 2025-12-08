@@ -1,0 +1,94 @@
+/* apps/finca/static/finca/css/delete.css */
+
+.delete-container {
+  max-width: 500px;
+  margin: 4rem auto;
+}
+
+.delete-card {
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.delete-header {
+  background: linear-gradient(135deg, #fc8181 0%, #f56565 100%);
+  color: white;
+  padding: 2rem;
+  text-align: center;
+}
+
+.delete-icon {
+  font-size: 4rem;
+  margin-bottom: 0.5rem;
+}
+
+.delete-header h2 {
+  margin: 0;
+  font-size: 1.6rem;
+  font-weight: 700;
+}
+
+.delete-body {
+  padding: 2rem;
+  text-align: center;
+}
+
+.delete-message {
+  font-size: 1.1rem;
+  color: #2d3748;
+  margin-bottom: 1rem;
+  line-height: 1.6;
+}
+
+.finca-name {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: #c53030;
+  margin: 1rem 0;
+}
+
+.delete-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.btn {
+  flex: 1;
+  padding: 0.875rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 1rem;
+  text-decoration: none;
+  text-align: center;
+  transition: all 0.3s;
+  border: none;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.btn-danger {
+  background: linear-gradient(135deg, #fc8181 0%, #f56565 100%);
+  color: white;
+}
+
+.btn-danger:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(245, 101, 101, 0.3);
+  color: white;
+}
+
+.btn-cancel {
+  background: #e2e8f0;
+  color: #4a5568;
+}
+
+.btn-cancel:hover {
+  background: #cbd5e0;
+  color: #2d3748;
+}

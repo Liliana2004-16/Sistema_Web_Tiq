@@ -1,34 +1,232 @@
 {% extends "base.html" %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'users/css/users_list.css' %}">
+{% endblock %}
+
 {% block content %}
-<div style="padding:20px;">
-  <h2>Gestión de Usuarios</h2>
-  <table border="1" cellpadding="6">
-    <thead>
-      <tr><th>Nombre</th><th>Cédula</th><th>Correo</th><th>Empresa</th><th>Rol</th><th>Estado</th><th>Acciones</th></tr>
-    </thead>
-    <tbody>
-      {% for u in users %}
-      <tr>
-        <td>{{ u.first_name }} {{ u.last_name }}</td>
-        <td>{{ u.cedula }}</td>
-        <td>{{ u.email }}</td>
-        <td>{{ u.empresa }}</td>
-        <td>{{ u.rol }}</td>
-        <td>{{ u.is_active|yesno:"Activo,Inactivo" }}</td>
-        <td>
-          <form method="post" style="display:inline">
-            {% csrf_token %}
-            <input type="hidden" name="user_id" value="{{ u.id }}">
-            <button name="action" value="toggle_active" type="submit">
-              {% if u.is_active %}Desactivar{% else %}Activar{% endif %}
-            </button>
-          </form>
-        </td>
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
-  <br>
-  <a href="{% url 'users:register' %}">Registrar nuevo usuario</a>
+<div class="container-fluid py-4">
+    <div class="row">
+        <div class="col-12">
+            <!-- Header -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2 class="text-success fw-bold mb-0">
+                    <i class="bi bi-people-fill me-2"></i>Gestión de Usuarios
+                </h2>
+                <a href="{% url 'users:register' %}" class="btn btn-success">
+                    <i class="bi bi-person-plus-fill me-2"></i>Nuevo Usuario
+                </a>
+            </div>
+
+            <!-- Mensajes -->
+            <!-- Mensajes -->
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                        {% if message.tags == 'success' %}
+                            <i class="bi bi-check-circle-fill me-2"></i>
+                        {% elif message.tags == 'error' %}
+                            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                        {% elif message.tags == 'warning' %}
+                            <i class="bi bi-exclamation-circle-fill me-2"></i>
+                        {% else %}
+                            <i class="bi bi-info-circle-fill me-2"></i>
+                        {% endif %}
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+            <!-- Filtros y Búsqueda -->
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <div class="input-group">
+                                <span class="input-group-text bg-white">
+                                    <i class="bi bi-search"></i>
+                                </span>
+                                <input type="text" class="form-control" id="searchInput" 
+                                       placeholder="Buscar por nombre, cédula o correo...">
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <select class="form-select" id="filterRol">
+                                <option value="">Todos los roles</option>
+                                <option value="Gerente">Gerente</option>
+                                <option value="Administrador Finca">Administrador Finca</option>
+                                <option value="Auxiliar">Auxiliar</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <select class="form-select" id="filterEstado">
+                                <option value="">Todos los estados</option>
+                                <option value="Activo">Activo</option>
+                                <option value="Inactivo">Inactivo</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tabla de Usuarios -->
+            <div class="card shadow-sm border-0">
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0" id="usersTable">
+                            <thead class="table-success">
+                                <tr>
+                                    <th class="text-center" style="width: 50px;">
+                                        <input type="checkbox" class="form-check-input" id="selectAll">
+                                    </th>
+                                    <th>Nombre completo</th>
+                                    <th>Cédula</th>
+                                    <th>Correo</th>
+                                    <th>Empresa</th>
+                                    <th>Rol</th>
+                                    <th class="text-center">Estado</th>
+                                    <th class="text-center" style="width: 120px;">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for u in users %}
+                                <tr data-user-id="{{ u.id }}" 
+                                    data-nombre="{{ u.get_full_name }}"
+                                    data-cedula="{{ u.cedula }}"
+                                    data-correo="{{ u.email }}"
+                                    data-rol="{{ u.get_rol_display }}"
+                                    data-estado="{{ u.is_active|yesno:'Activo,Inactivo' }}">
+                                    <td class="text-center">
+                                        <input type="checkbox" class="form-check-input user-checkbox" 
+                                               value="{{ u.id }}">
+                                    </td>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="avatar-circle me-2">
+                                                {{ u.first_name.0|upper }}{{ u.last_name.0|upper }}
+                                            </div>
+                                            <strong>{{ u.get_full_name }}</strong>
+                                        </div>
+                                    </td>
+                                    <td>{{ u.cedula }}</td>
+                                    <td>
+                                        <i class="bi bi-envelope text-muted me-1"></i>{{ u.email }}
+                                    </td>
+                                    <td>{{ u.empresa.nombre|default:"Sin empresa" }}</td>
+                                    <td>
+                                        <span class="badge bg-info">{{ u.get_rol_display }}</span>
+                                    </td>
+                                    <td class="text-center">
+                                        <form method="post" class="d-inline toggle-status-form">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="action" value="toggle_active">
+                                            <input type="hidden" name="user_id" value="{{ u.id }}">
+                                            <button type="submit" class="btn btn-sm btn-toggle-status {{ u.is_active|yesno:'btn-success,btn-secondary' }}">
+                                                {{ u.is_active|yesno:'Activo,Inactivo' }}
+                                            </button>
+                                        </form>
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="btn-group" role="group">
+                                            <button type="button" class="btn btn-sm btn-outline-primary" 
+                                                    data-bs-toggle="modal" 
+                                                    data-bs-target="#editModal"
+                                                    data-user-id="{{ u.id }}"
+                                                    data-user-name="{{ u.get_full_name }}"
+                                                    data-user-rol="{{ u.rol }}"
+                                                    title="Editar rol">
+                                                <i class="bi bi-pencil"></i>
+                                            </button>
+                                            <button type="button" class="btn btn-sm btn-outline-info"
+                                                    onclick="viewUserDetails( 'u:id')"
+                                                    title="Ver detalles">
+                                                <i class="bi bi-eye"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="8" class="text-center py-4 text-muted">
+                                        <i class="bi bi-inbox fs-1 d-block mb-2"></i>
+                                        No hay usuarios registrados
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <!-- Footer con información -->
+                <div class="card-footer bg-light">
+                    <div class="row align-items-center">
+                        <div class="col-md-6">
+                            <small class="text-muted">
+                                Mostrando <span id="showingCount">{{ users|length }}</span> de 
+                                <span id="totalCount">{{ users|length }}</span> usuarios
+                            </small>
+                        </div>
+                        <div class="col-md-6 text-end">
+                            <button class="btn btn-sm btn-success" id="btnActualizarMasivo" 
+                                    style="display: none;">
+                                <i class="bi bi-check-circle me-1"></i>Actualizar seleccionados
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
+
+<!-- Modal Editar Rol -->
+<div class="modal fade" id="editModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title">
+                    <i class="bi bi-pencil-square me-2"></i>Editar Rol de Usuario
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="post" id="editRolForm">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <input type="hidden" name="action" value="promote">
+                    <input type="hidden" name="user_id" id="editUserId">
+                    
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Usuario:</label>
+                        <p class="form-control-plaintext" id="editUserName"></p>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="editUserRol" class="form-label fw-semibold">
+                            <i class="bi bi-shield-check me-1"></i>Nuevo Rol:
+                        </label>
+                        <select class="form-select" name="new_role" id="editUserRol" required>
+                            <option value="">Seleccione un rol</option>
+                            <option value="Gerente">Gerente</option>
+                            <option value="Administrador Finca">Administrador Finca</option>
+                            <option value="Auxiliar">Auxiliar</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-success">
+                        <i class="bi bi-check-circle me-1"></i>Guardar cambios
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'users/js/users_list.js' %}"></script>
 {% endblock %}

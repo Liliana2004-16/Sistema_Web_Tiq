@@ -1,13 +1,49 @@
 {% extends "base.html" %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'finca/css/delete.css' %}">
+{% endblock %}
+
 {% block content %}
-<h2>Eliminar Finca</h2>
+<div class="container mt-4 mb-5">
+  <div class="delete-container">
+    <div class="delete-card">
+      
+      <div class="delete-header">
+        <div class="delete-icon"></div>
+        <h2>Eliminar Finca</h2>
+      </div>
 
-<p>¿Seguro que deseas eliminar la finca <b>{{ finca.nombre }}</b>?</p>
+      <div class="delete-body">
+        
+        <p class="delete-message">
+          ¿Está seguro que desea eliminar la finca
+        </p>
+        
+        <div class="finca-name">
+          {{ finca.nombre }}
+        </div>
 
-<form method="POST">
-    {% csrf_token %}
-    <button type="submit">Sí, eliminar</button>
-</form>
+        <p class="delete-message" style="font-size: 0.95rem; color: #718096;">
+          Esta acción no se puede deshacer
+        </p>
 
-<a href="{% url 'finca:list' %}">Cancelar</a>
+        <form method="POST">
+          {% csrf_token %}
+          
+          <div class="delete-actions">
+            <a href="{% url 'finca:list' %}" class="btn btn-cancel">
+              ← Cancelar
+            </a>
+            <button type="submit" class="btn btn-danger">
+              Sí, eliminar
+            </button>
+          </div>
+        </form>
+
+      </div>
+    </div>
+  </div>
+</div>
 {% endblock %}

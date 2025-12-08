@@ -200,7 +200,7 @@
 {% if user.is_authenticated %}
 <!-- SIDEBAR -->
 <div class="sidebar">
-    <h3>🌾 Agrotiquiza</h3>
+    <h3> Agrotiquiza</h3>
 
     <a href="/inventario/" class="nav-link">
          Inicio
@@ -229,7 +229,7 @@
                     <li><a href="{% url 'ganaderia:eventos_salida_list' %}">Eventos de Salida</a></li>
                     <li><a href="{% url 'ganaderia:registrar_produccion' %}">Producción de Leche</a></li>
                     <li><a href="{% url 'ganaderia:traslados' %}">Traslados</a></li>
-                    <li><a href="{% url 'finca:create' %}">Registrar Finca</a></li>
+                    <li><a href="{% url 'finca:list' %}">Registrar Finca</a></li>
                 </ul>
             </details>
         </li>
