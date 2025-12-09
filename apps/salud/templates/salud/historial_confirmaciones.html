@@ -1,51 +1,89 @@
 {% extends "base.html" %}
 {% load static %}
 
-<h3>Historial de Confirmaciones</h3>
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'salud/css/historial_confirmaciones.css' %}">
+{% endblock %}
 
-<form method="GET" class="form-inline mb-3">
+{% block content %}
+<div class="historial-container">
+    
+    <h3 class="historial-title">Historial de Confirmaciones</h3>
 
-    <label class="mr-2">Mes:</label>
-    <select name="mes" class="form-control mr-3">
-        <option value="">Todos</option>
-        {% for i in 1|to:12 %}
-        <option value="{{ i }}">{{ i }}</option>
-        {% endfor %}
-    </select>
+    <form method="GET" class="filter-form">
+        <div class="filter-row">
+            <div class="filter-group">
+                <label class="filter-label">Mes:</label>
+                <select name="mes" class="filter-select">
+                    <option value="">Todos</option>
+                    <option value="1" {% if mes_seleccionado == "1" %}selected{% endif %}>Enero</option>
+                    <option value="2" {% if mes_seleccionado == "2" %}selected{% endif %}>Febrero</option>
+                    <option value="3" {% if mes_seleccionado == "3" %}selected{% endif %}>Marzo</option>
+                    <option value="4" {% if mes_seleccionado == "4" %}selected{% endif %}>Abril</option>
+                    <option value="5" {% if mes_seleccionado == "5" %}selected{% endif %}>Mayo</option>
+                    <option value="6" {% if mes_seleccionado == "6" %}selected{% endif %}>Junio</option>
+                    <option value="7" {% if mes_seleccionado == "7" %}selected{% endif %}>Julio</option>
+                    <option value="8" {% if mes_seleccionado == "8" %}selected{% endif %}>Agosto</option>
+                    <option value="9" {% if mes_seleccionado == "9" %}selected{% endif %}>Septiembre</option>
+                    <option value="10" {% if mes_seleccionado == "10" %}selected{% endif %}>Octubre</option>
+                    <option value="11" {% if mes_seleccionado == "11" %}selected{% endif %}>Noviembre</option>
+                    <option value="12" {% if mes_seleccionado == "12" %}selected{% endif %}>Diciembre</option>
+                </select>
+            </div>
 
-    <label class="mr-2">Estado:</label>
-    <select name="estado" class="form-control mr-3">
-        <option value="">Todos</option>
-        <option value="gestante">Gestante</option>
-        <option value="negativa">No Gestante</option>
-    </select>
+            <div class="filter-group">
+                <label class="filter-label">Estado:</label>
+                <select name="estado" class="filter-select">
+                    <option value="">Todos</option>
+                    <option value="gestante" {% if estado_seleccionado == "gestante" %}selected{% endif %}>Gestante</option>
+                    <option value="negativa" {% if estado_seleccionado == "negativa" %}selected{% endif %}>No Gestante</option>
+                </select>
+            </div>
 
-    <button class="btn btn-primary">Filtrar</button>
-</form>
+            <div class="filter-group">
+                <button type="submit" class="btn-filter">Filtrar</button>
+            </div>
+        </div>
+    </form>
 
-<table class="table table-striped">
-    <thead>
-        <tr>
-            <th>Arete</th>
-            <th>Animal</th>
-            <th>Fecha Confirmación</th>
-            <th>Método</th>
-            <th>Resultado</th>
-            <th>Responsable</th>
-            <th>Obs</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for h in historial %}
-        <tr>
-            <td>{{ h.inseminacion.animal.numero_arete }}</td>
-            <td>{{ h.inseminacion.animal.nombre }}</td>
-            <td>{{ h.fecha_confirmacion }}</td>
-            <td>{{ h.metodo_diagnostico }}</td>
-            <td>{{ h.get_resultado_display }}</td>
-            <td>{{ h.responsable }}</td>
-            <td>{{ h.observaciones }}</td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
+    <div class="table-wrapper">
+        <table class="historial-table">
+            <thead>
+                <tr>
+                    <th>Arete</th>
+                    <th>Animal</th>
+                    <th>Fecha Confirmación</th>
+                    <th>Método</th>
+                    <th>Resultado</th>
+                    <th>Responsable</th>
+                    <th>Observaciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for h in historial %}
+                <tr>
+                    <td>{{ h.inseminacion.animal.numero_arete }}</td>
+                    <td>{{ h.inseminacion.animal.nombre }}</td>
+                    <td>{{ h.fecha_confirmacion|date:"d/m/Y" }}</td>
+                    <td>{{ h.metodo_diagnostico }}</td>
+                    <td>{{ h.get_resultado_display }}</td>
+                    <td>{{ h.responsable }}</td>
+                    <td>{{ h.observaciones|default:"—" }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="7" style="text-align: center; padding: 20px;">
+                        No hay registros que coincidan con los filtros seleccionados.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'salud/js/historial_confirmaciones.js' %}"></script>
+{% endblock %}

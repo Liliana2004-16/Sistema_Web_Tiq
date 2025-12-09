@@ -1,5 +1,3 @@
-# apps/salud/services.py
-
 from django.db import transaction
 from django.core.exceptions import ValidationError
 
@@ -85,7 +83,6 @@ class GestacionService:
             observaciones=observaciones
         )
 
-        # Actualización del estado reproductivo del animal
         animal = inseminacion.animal
         animal.estado = "Gestante" if resultado == "gestante" else "No gestante"
         animal.save()

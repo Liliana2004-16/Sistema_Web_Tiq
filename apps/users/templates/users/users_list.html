@@ -9,7 +9,6 @@
 <div class="container-fluid py-4">
     <div class="row">
         <div class="col-12">
-            <!-- Header -->
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <h2 class="text-success fw-bold mb-0">
                     <i class="bi bi-people-fill me-2"></i>Gestión de Usuarios
@@ -19,27 +18,15 @@
                 </a>
             </div>
 
-            <!-- Mensajes -->
-            <!-- Mensajes -->
             {% if messages %}
                 {% for message in messages %}
                     <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
-                        {% if message.tags == 'success' %}
-                            <i class="bi bi-check-circle-fill me-2"></i>
-                        {% elif message.tags == 'error' %}
-                            <i class="bi bi-exclamation-triangle-fill me-2"></i>
-                        {% elif message.tags == 'warning' %}
-                            <i class="bi bi-exclamation-circle-fill me-2"></i>
-                        {% else %}
-                            <i class="bi bi-info-circle-fill me-2"></i>
-                        {% endif %}
                         {{ message }}
                         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                     </div>
                 {% endfor %}
             {% endif %}
 
-            <!-- Filtros y Búsqueda -->
             <div class="card shadow-sm border-0 mb-4">
                 <div class="card-body">
                     <div class="row g-3">
@@ -52,14 +39,7 @@
                                        placeholder="Buscar por nombre, cédula o correo...">
                             </div>
                         </div>
-                        <div class="col-md-3">
-                            <select class="form-select" id="filterRol">
-                                <option value="">Todos los roles</option>
-                                <option value="Gerente">Gerente</option>
-                                <option value="Administrador Finca">Administrador Finca</option>
-                                <option value="Auxiliar">Auxiliar</option>
-                            </select>
-                        </div>
+
                         <div class="col-md-3">
                             <select class="form-select" id="filterEstado">
                                 <option value="">Todos los estados</option>
@@ -85,23 +65,23 @@
                                     <th>Cédula</th>
                                     <th>Correo</th>
                                     <th>Empresa</th>
-                                    <th>Rol</th>
                                     <th class="text-center">Estado</th>
                                     <th class="text-center" style="width: 120px;">Acciones</th>
                                 </tr>
                             </thead>
+
                             <tbody>
                                 {% for u in users %}
-                                <tr data-user-id="{{ u.id }}" 
+                                <tr data-user-id="{{ u.id }}"
                                     data-nombre="{{ u.get_full_name }}"
                                     data-cedula="{{ u.cedula }}"
                                     data-correo="{{ u.email }}"
-                                    data-rol="{{ u.get_rol_display }}"
                                     data-estado="{{ u.is_active|yesno:'Activo,Inactivo' }}">
+
                                     <td class="text-center">
-                                        <input type="checkbox" class="form-check-input user-checkbox" 
-                                               value="{{ u.id }}">
+                                        <input type="checkbox" class="form-check-input user-checkbox" value="{{ u.id }}">
                                     </td>
+
                                     <td>
                                         <div class="d-flex align-items-center">
                                             <div class="avatar-circle me-2">
@@ -110,14 +90,15 @@
                                             <strong>{{ u.get_full_name }}</strong>
                                         </div>
                                     </td>
+
                                     <td>{{ u.cedula }}</td>
+
                                     <td>
                                         <i class="bi bi-envelope text-muted me-1"></i>{{ u.email }}
                                     </td>
+
                                     <td>{{ u.empresa.nombre|default:"Sin empresa" }}</td>
-                                    <td>
-                                        <span class="badge bg-info">{{ u.get_rol_display }}</span>
-                                    </td>
+
                                     <td class="text-center">
                                         <form method="post" class="d-inline toggle-status-form">
                                             {% csrf_token %}
@@ -128,28 +109,21 @@
                                             </button>
                                         </form>
                                     </td>
+
                                     <td class="text-center">
                                         <div class="btn-group" role="group">
-                                            <button type="button" class="btn btn-sm btn-outline-primary" 
-                                                    data-bs-toggle="modal" 
-                                                    data-bs-target="#editModal"
-                                                    data-user-id="{{ u.id }}"
-                                                    data-user-name="{{ u.get_full_name }}"
-                                                    data-user-rol="{{ u.rol }}"
-                                                    title="Editar rol">
-                                                <i class="bi bi-pencil"></i>
-                                            </button>
                                             <button type="button" class="btn btn-sm btn-outline-info"
-                                                    onclick="viewUserDetails( 'u:id')"
+                                                    onclick="viewUserDetails('{{ u.id }}')"
                                                     title="Ver detalles">
                                                 <i class="bi bi-eye"></i>
                                             </button>
                                         </div>
                                     </td>
+
                                 </tr>
                                 {% empty %}
                                 <tr>
-                                    <td colspan="8" class="text-center py-4 text-muted">
+                                    <td colspan="7" class="text-center py-4 text-muted">
                                         <i class="bi bi-inbox fs-1 d-block mb-2"></i>
                                         No hay usuarios registrados
                                     </td>
@@ -159,8 +133,8 @@
                         </table>
                     </div>
                 </div>
-                
-                <!-- Footer con información -->
+
+                <!-- Footer -->
                 <div class="card-footer bg-light">
                     <div class="row align-items-center">
                         <div class="col-md-6">
@@ -170,61 +144,18 @@
                             </small>
                         </div>
                         <div class="col-md-6 text-end">
-                            <button class="btn btn-sm btn-success" id="btnActualizarMasivo" 
-                                    style="display: none;">
+                            <button class="btn btn-sm btn-success" id="btnActualizarMasivo" style="display: none;">
                                 <i class="bi bi-check-circle me-1"></i>Actualizar seleccionados
                             </button>
                         </div>
                     </div>
                 </div>
+
             </div>
         </div>
     </div>
 </div>
 
-<!-- Modal Editar Rol -->
-<div class="modal fade" id="editModal" tabindex="-1">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header bg-success text-white">
-                <h5 class="modal-title">
-                    <i class="bi bi-pencil-square me-2"></i>Editar Rol de Usuario
-                </h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-            </div>
-            <form method="post" id="editRolForm">
-                {% csrf_token %}
-                <div class="modal-body">
-                    <input type="hidden" name="action" value="promote">
-                    <input type="hidden" name="user_id" id="editUserId">
-                    
-                    <div class="mb-3">
-                        <label class="form-label fw-semibold">Usuario:</label>
-                        <p class="form-control-plaintext" id="editUserName"></p>
-                    </div>
-                    
-                    <div class="mb-3">
-                        <label for="editUserRol" class="form-label fw-semibold">
-                            <i class="bi bi-shield-check me-1"></i>Nuevo Rol:
-                        </label>
-                        <select class="form-select" name="new_role" id="editUserRol" required>
-                            <option value="">Seleccione un rol</option>
-                            <option value="Gerente">Gerente</option>
-                            <option value="Administrador Finca">Administrador Finca</option>
-                            <option value="Auxiliar">Auxiliar</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="submit" class="btn btn-success">
-                        <i class="bi bi-check-circle me-1"></i>Guardar cambios
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
 {% endblock %}
 
 {% block extra_js %}

@@ -16,7 +16,6 @@ def role_required(*roles_permitidos):
                 messages.error(request, "Debes iniciar sesión.")
                 return redirect('users:login')
 
-            # Validamos que el usuario tenga rol
             if not hasattr(request.user, 'rol') or not request.user.rol:
                 messages.error(request, "Tu usuario no tiene un rol asignado.")
                 return redirect('users:dashboard')

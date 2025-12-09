@@ -50,10 +50,7 @@
                 <td>{{ e.get_tipo_evento_display }}</td>
                 <td>{{ e.observaciones }}</td>
 
-                
-                <!-- COLUMNA DE ACCIONES -->
             <td>
-                <!-- ELIMINAR con confirmación -->
                 <a href="{% url 'ganaderia:evento_salida_eliminar' e.id %}"
                 class="text-danger ml-2"
                 onclick="return confirm('¿Seguro que deseas eliminar este evento de salida?');">

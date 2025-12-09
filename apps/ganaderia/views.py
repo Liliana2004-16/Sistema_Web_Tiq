@@ -1,11 +1,10 @@
-# apps/ganaderia/views.py
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from .models import Animal, Pesaje, Parto, ProduccionLeche, EventoSalida
 from .forms import PesajeForm, PartoForm, ProduccionForm, EventoSalidaForm, TrasladoForm, PesajeEditForm
 from .services import AnimalService
-from apps.users.decorators import role_required  # vamos a crear este decorador en users
+from apps.users.decorators import role_required  
 from django.core.paginator import Paginator
 import openpyxl
 from openpyxl import Workbook
@@ -46,7 +45,6 @@ def buscar_animal_por_arete(request):
 @role_required("Gerente", "Administrador Finca")
 def pesajes_list_view(request):
 
-    # --- REGISTRO DE PESAJE (POST) ---
     if request.method == "POST":
         form = PesajeForm(request.POST)
 
@@ -68,16 +66,10 @@ def pesajes_list_view(request):
 
     else:
         form = PesajeForm()
-
-    # --- LISTADO DE PESAJES ---
     queryset = Pesaje.objects.all()
-
-    # filtro por mes
     mes = request.GET.get('mes')
     if mes:
         queryset = queryset.filter(fecha__month=mes)
-
-    # Exportar Excel
     if "exportar" in request.GET:
         return exportar_pesajes_excel(queryset)
 
@@ -122,10 +114,8 @@ def exportar_pesajes_excel(queryset):
     ws = wb.active
     ws.title = "Pesajes"
 
-    # Encabezados
     ws.append(["Fecha", "Arete", "Nombre", "Peso (kg)", "Finca"])
 
-    # Datos
     for p in queryset:
         ws.append([
             p.fecha,
@@ -135,7 +125,6 @@ def exportar_pesajes_excel(queryset):
             p.finca.nombre
         ])
 
-    # Respuesta HTTP
     response = HttpResponse(
         content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
     )
@@ -183,12 +172,9 @@ def eliminar_parto(request, id):
     parto = get_object_or_404(Parto, id=id)
     madre = parto.madre
     cria = parto.cria
-
-    # Si eliminas el parto, la madre debe volver a "gestante"
     madre.estado = "Gestante"
     madre.save()
 
-    # Si quieres eliminar la cría también:
     if cria:
         cria.delete()
 
@@ -211,19 +197,16 @@ def registrar_parto_view(request):
         peso = request.POST.get("peso")
         finca_id = request.POST.get("finca")
 
-        # Validación madre
         try:
             madre = Animal.objects.get(numero_arete=madre_arete)
         except Animal.DoesNotExist:
             messages.error(request, "La madre no existe.")
             return redirect("ganaderia:registrar_parto")
 
-        # Validación cría duplicada
         if Animal.objects.filter(numero_arete=cria_arete).exists():
             messages.error(request, "Ya existe un animal con ese número de arete.")
             return redirect("ganaderia:registrar_parto")
 
-        # Crear cría
         cria = Animal.objects.create(
             numero_arete=cria_arete,
             nombre=nombre_cria,
@@ -235,7 +218,6 @@ def registrar_parto_view(request):
             estado="activo"
         )
 
-        # Registrar parto
         Parto.objects.create(
             fecha_nacimiento=fecha,
             madre=madre,
@@ -256,7 +238,6 @@ def registrar_parto_view(request):
     
     estados_validos = ["activo", "Gestante", "trasladado"]
 
-    # GET → Mostrar formulario
     fincas = Finca.objects.all()
     madres = Animal.objects.filter(
         estado__in=estados_validos
@@ -277,13 +258,11 @@ def partos_excel(request):
     ws = wb.active
     ws.title = "Partos"
 
-    # Encabezados
     ws.append([
         "Madre", "Fecha Nacimiento Cría", "Nombre Cría",
         "Arete Cría", "Finca", "Raza", "Sexo", "Peso (kg)"
     ])
 
-    # Datos
     for p in Parto.objects.select_related("madre", "cria", "finca"):
         ws.append([
             p.madre.numero_arete,
@@ -326,9 +305,6 @@ def registrar_produccion_view(request):
         "meses": meses, 
     })
 
-# ================================================================
-#   REGISTRO PRODUCCIÓN AM
-# ================================================================
 def produccion_am_view(request):
     if request.method == "POST":
         form = ProduccionForm(request.POST)
@@ -360,10 +336,6 @@ def produccion_am_view(request):
 
     return render(request, "ganaderia/registrar_produccion.html", {"form": form})
 
-
-# ================================================================
-#   REGISTRO PRODUCCIÓN PM
-# ================================================================
 def produccion_pm_view(request):
     if request.method == "POST":
         form = ProduccionForm(request.POST)
@@ -392,15 +364,9 @@ def produccion_pm_view(request):
 
     else:
         form = ProduccionForm()
-
-    # 🔥 CORREGIDO: antes decía resgistrar_produccion.html
     return render(request, "ganaderia/registrar_produccion.html", {"form": form})
 
 
-
-# ================================================================
-#   EXPORTAR REGISTROS A EXCEL
-# ================================================================
 @login_required
 @role_required("Gerente", "Administrador Finca")
 def produccion_export_excel(request):
@@ -415,10 +381,8 @@ def produccion_export_excel(request):
     ws = wb.active
     ws.title = "Producción"
 
-    # Cabeceras
     ws.append(["Fecha", "Arete", "Nombre", "Finca", "AM", "PM", "Total Diario"])
 
-    # Filas
     for p in datos:
         ws.append([
             p.fecha,
@@ -430,7 +394,6 @@ def produccion_export_excel(request):
             p.total_diario,
         ])
 
-    # Respuesta Excel
     response = HttpResponse(
         content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
     )
@@ -445,7 +408,6 @@ def eventos_salida_list_view(request):
 
     eventos = EventoSalida.objects.select_related("animal").all()
 
-    # --- FILTROS ---
     fecha = request.GET.get("fecha", "")
     tipo = request.GET.get("tipo", "")
 
@@ -510,8 +472,7 @@ def evento_salida_eliminar(request, id):
     evento = get_object_or_404(EventoSalida, id=id)
     animal = evento.animal
 
-    # --- Restaurar estado ---
-    animal.estado = "Activo"   # O el estado anterior si lo guardas en otro campo
+    animal.estado = "Activo"  
     animal.save()
     evento.delete()
     messages.success(request, "Evento eliminado correctamente.")
@@ -522,7 +483,6 @@ def evento_salida_eliminar(request, id):
 @login_required
 def traslados_view(request):
 
-    # --- FILTRO POR ARETE ---
     q = request.GET.get("q", "")
     animales = Animal.objects.all().select_related("finca")
 

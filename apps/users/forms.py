@@ -1,10 +1,8 @@
 # apps/users/forms.py
 
 from django import forms
-from django.contrib.auth.forms import AuthenticationForm, UserCreationForm, SetPasswordForm
-from .models import User, Empresa
-from django.contrib.auth.forms import PasswordChangeForm
-from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth.forms import AuthenticationForm, PasswordChangeForm
+from .models import User, Empresa, Rol
 from django.core.exceptions import ValidationError
 import re
 
@@ -13,7 +11,6 @@ import re
 # LOGIN
 # ============================================================
 class LoginForm(AuthenticationForm):
-    # Mensaje de error personalizado
     error_messages = {
         'invalid_login': "Cédula o contraseña incorrecta.",
         'inactive': "Usuario inactivo. Contacte al administrador.",
@@ -45,24 +42,29 @@ class LoginForm(AuthenticationForm):
         return ced
 
     def confirm_login_allowed(self, user):
-        """
-        Controla si un usuario puede iniciar sesión.
-        Se ejecuta después de validar las credenciales.
-        """
         if not user.is_active:
             raise ValidationError(
                 self.error_messages['inactive'],
                 code='inactive',
             )
+
+
 # ============================================================
-# REGISTRO DE USUARIOS (CORREGIDO)
+# REGISTRO DE USUARIOS
 # ============================================================
 class UserRegisterForm(forms.ModelForm):
-
     empresa = forms.ModelChoiceField(
         queryset=Empresa.objects.all(),
         required=False,
-        label="Empresa"
+        label="Empresa",
+        widget=forms.Select(attrs={'class': 'form-control'})
+    )
+    
+    rol = forms.ModelChoiceField(
+        queryset=Rol.objects.all(),
+        required=True,
+        label="Rol",
+        widget=forms.Select(attrs={'class': 'form-control'})
     )
 
     class Meta:
@@ -74,15 +76,28 @@ class UserRegisterForm(forms.ModelForm):
             'first_name': 'Nombre',
             'last_name': 'Apellido',
             'email': 'Correo electrónico',
-            'rol': 'Rol',
-            'empresa': 'Empresa',
         }
 
         widgets = {
-            'cedula': forms.TextInput(attrs={'pattern': '[0-9]+'}),
+            'cedula': forms.TextInput(attrs={
+                'class': 'form-control',
+                'pattern': '[0-9]+',
+                'placeholder': 'Ingrese la cédula'
+            }),
+            'first_name': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Ingrese el nombre'
+            }),
+            'last_name': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Ingrese el apellido'
+            }),
+            'email': forms.EmailInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'correo@ejemplo.com'
+            }),
         }
 
-    # Validación de cédula
     def clean_cedula(self):
         ced = self.cleaned_data.get('cedula')
         if not ced or not ced.isdigit():
@@ -91,17 +106,26 @@ class UserRegisterForm(forms.ModelForm):
             raise ValidationError("La cédula ya está registrada.")
         return ced
 
-    # Validación de correo
     def clean_email(self):
         email = self.cleaned_data.get('email')
         if User.objects.filter(email=email).exists():
             raise ValidationError("El correo ya está registrado.")
         return email
+
+
+# ============================================================
+# RECUPERAR CONTRASEÑA
+# ============================================================
 class RecoverPasswordForm(forms.Form):
     cedula = forms.CharField(
         label='Cédula',
         max_length=20,
-        widget=forms.TextInput(attrs={'pattern': '[0-9]+', 'inputmode': 'numeric'})
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'pattern': '[0-9]+', 
+            'inputmode': 'numeric',
+            'placeholder': 'Ingrese su cédula'
+        })
     )
 
     def clean_cedula(self):
@@ -112,15 +136,32 @@ class RecoverPasswordForm(forms.Form):
             raise ValidationError('No existe un usuario con esa cédula.')
         return ced
 
+
+# ============================================================
+# CAMBIAR CONTRASEÑA
+# ============================================================
 class CustomPasswordChangeForm(PasswordChangeForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
         self.fields['old_password'].label = "Contraseña actual"
+        self.fields['old_password'].widget.attrs.update({
+            'class': 'form-control',
+            'placeholder': 'Ingrese su contraseña actual'
+        })
+        
         self.fields['new_password1'].label = "Nueva contraseña"
+        self.fields['new_password1'].widget.attrs.update({
+            'class': 'form-control',
+            'placeholder': 'Ingrese la nueva contraseña'
+        })
+        
         self.fields['new_password2'].label = "Confirmar nueva contraseña"
+        self.fields['new_password2'].widget.attrs.update({
+            'class': 'form-control',
+            'placeholder': 'Confirme la nueva contraseña'
+        })
 
-        # Mensajes en español
         self.fields['new_password1'].help_text = (
             "<ul>"
             "<li>La contraseña no puede ser similar a su información personal.</li>"
@@ -129,4 +170,3 @@ class CustomPasswordChangeForm(PasswordChangeForm):
             "<li>No puede ser completamente numérica.</li>"
             "</ul>"
         )
-

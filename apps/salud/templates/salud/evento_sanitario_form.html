@@ -1,79 +1,89 @@
 {% extends "base.html" %}
 {% load static %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'salud/css/evento_sanitario.css' %}">
+{% endblock %}
+
 {% block content %}
-<div class="container mt-4">
+<div class="evento-container">
 
-    <h2>Registrar Evento Sanitario</h2>
+    <h2 class="evento-title">Registrar Evento Sanitario</h2>
 
-
-    <form method="POST">
+    <form method="POST" class="evento-form">
         {% csrf_token %}
 
+        <!-- Fecha del evento -->
         <div class="form-group">
-            <label>Fecha del evento:</label>
+            <label class="form-label required">Fecha del evento:</label>
             {{ form.fecha }}
         </div>
 
-        <div class="form-group">
-            <label>Número de Arete:</label>
-            <input type="hidden" id="id_animal" name="animal" value="{{ form.instance.animal.id }}">
-            <input type="text" id="arete" class="form-control" name="numero_arete">
-            <button type="button" id="buscar" class="btn btn-secondary mt-2">Buscar Animal</button>
+        <!-- Búsqueda de animal -->
+        <div class="search-section">
+            <div class="form-group">
+                <label class="form-label required">Número de Arete:</label>
+                <div class="search-group">
+                    <div class="search-input-wrapper">
+                        <input type="hidden" id="id_animal" name="animal" value="{{ form.instance.animal.id }}">
+                        <input type="text" id="arete" class="form-control" name="numero_arete" 
+                               placeholder="Ej: A001" autocomplete="off">
+                    </div>
+                    <button type="button" id="buscar" class="btn-search">Buscar Animal</button>
+                </div>
+            </div>
+
+            <!-- Información del animal -->
+            <div class="animal-info">
+                <div class="info-card">
+                    <div class="info-label">Nombre del Animal</div>
+                    <input type="text" id="nombre" class="form-control" readonly 
+                           placeholder="Busque primero el animal">
+                </div>
+
+                <div class="info-card">
+                    <div class="info-label">Edad</div>
+                    <input type="text" id="edad" class="form-control" readonly 
+                           placeholder="—">
+                </div>
+            </div>
         </div>
 
+        <!-- Diagnóstico -->
         <div class="form-group">
-            <label>Nombre del Animal:</label>
-            <input type="text" id="nombre" class="form-control" readonly>
-        </div>
-
-        <div class="form-group">
-            <label>Edad (días):</label>
-            <input type="text" id="edad" class="form-control" readonly>
-        </div>
-
-        <div class="form-group">
-            <label>Diagnóstico:</label>
+            <label class="form-label required">Diagnóstico:</label>
             {{ form.diagnostico }}
         </div>
 
+        <!-- Tratamiento -->
         <div class="form-group">
-            <label>Tratamiento Aplicado:</label>
+            <label class="form-label required">Tratamiento Aplicado:</label>
             {{ form.tratamiento }}
         </div>
 
+        <!-- Responsable -->
         <div class="form-group">
-            <label>Responsable:</label>
+            <label class="form-label required">Responsable:</label>
             {{ form.responsable }}
         </div>
 
+        <!-- Síntomas -->
         <div class="form-group">
-            <label>Síntomas Observados (opcional):</label>
+            <label class="form-label">Síntomas Observados (opcional):</label>
             {{ form.sintomas }}
         </div>
 
-        <button class="btn btn-primary">Guardar Evento</button>
+        <!-- Botones de acción -->
+        <div class="form-actions">
+            <button type="submit" class="btn-primary">Guardar Evento</button>
+            <a href="{% url 'salud:evento_sanitario_list' %}" class="btn-secondary">✕ Cancelar</a>
+        </div>
 
     </form>
 
 </div>
+{% endblock %}
 
-<script>
-document.getElementById("buscar").addEventListener("click", function() {
-    let arete = document.getElementById("arete").value;
-
-    fetch(`/salud/buscar-animal/?arete=${arete}`)
-        .then(res => res.json())
-        .then(data => {
-            if (data.error) {
-                alert("Animal no encontrado.");
-            } else {
-                document.getElementById("nombre").value = data.nombre;
-                document.getElementById("edad").value = data.edad;
-                document.getElementById("id_animal").value = data.id;
-            }
-        });
-});
-</script>
-
+{% block extra_js %}
+<script src="{% static 'salud/js/evento_sanitario.js' %}"></script>
 {% endblock %}

@@ -1,13 +1,5 @@
-/* ============================================
-   DASHBOARD.JS - Agrotiquiza
-   Ubicación: static/js/dashboard.js
-   ============================================ */
-
 document.addEventListener("DOMContentLoaded", function () {
     
-    // ================================================
-    // 1. FUNCIONALIDAD DE TOGGLE (EXPANDIR/COLAPSAR)
-    // ================================================
     const toggleButtons = document.querySelectorAll(".toggle-btn");
 
     toggleButtons.forEach(btn => {
@@ -16,13 +8,10 @@ document.addEventListener("DOMContentLoaded", function () {
             const content = document.querySelector(targetId);
 
             if (content) {
-                // Toggle de la clase 'show'
                 content.classList.toggle("show");
-                
-                // Rotar el botón
+
                 this.classList.toggle("active");
                 
-                // Cambiar el icono del botón
                 if (content.classList.contains("show")) {
                     this.textContent = "▲";
                 } else {
@@ -32,10 +21,6 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     });
 
-    // ================================================
-    // 2. ABRIR TODOS LOS BLOQUES POR DEFECTO
-    // ================================================
-    // Si deseas que todos los bloques estén abiertos al cargar la página
     const allContents = document.querySelectorAll(".block-content");
     allContents.forEach(content => {
         content.classList.add("show");
@@ -46,9 +31,6 @@ document.addEventListener("DOMContentLoaded", function () {
         btn.classList.add("active");
     });
 
-    // ================================================
-    // 3. ANIMACIÓN DE CONTADORES (NÚMEROS)
-    // ================================================
     function animateCounter(element, start, end, duration) {
         let startTime = null;
         
@@ -67,28 +49,23 @@ document.addEventListener("DOMContentLoaded", function () {
         
         window.requestAnimationFrame(step);
     }
-
-    // Animar los números de las tarjetas de resumen
     const counterElements = document.querySelectorAll(".resumen-card h2");
     
     counterElements.forEach(el => {
         const text = el.textContent.trim();
-        // Extraer solo números (por si hay "L" u otros caracteres)
         const numberMatch = text.match(/[\d,]+/);
         
         if (numberMatch) {
             const targetNumber = parseInt(numberMatch[0].replace(/,/g, ""));
             const hasDecimals = text.includes(".");
             const suffix = text.replace(/[\d,\.]/g, "").trim();
-            
-            // Guardar el sufijo original
+
             const originalSuffix = suffix;
             
             if (!isNaN(targetNumber)) {
                 el.textContent = "0";
                 animateCounter(el, 0, targetNumber, 1500);
                 
-                // Agregar el sufijo después de la animación
                 setTimeout(() => {
                     if (originalSuffix) {
                         el.textContent = el.textContent + " " + originalSuffix;
@@ -98,9 +75,6 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     });
 
-    // ================================================
-    // 4. EFECTO PARALLAX EN IMÁGENES (OPCIONAL)
-    // ================================================
     const dashboardImages = document.querySelectorAll(".dashboard-img");
     
     if (dashboardImages.length > 0) {
@@ -115,10 +89,6 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
-    // ================================================
-    // 5. TOOLTIP INFORMATIVO (OPCIONAL)
-    // ================================================
-    // Si quieres agregar tooltips a elementos específicos
     const addTooltips = () => {
         const tooltipElements = document.querySelectorAll("[data-tooltip]");
         
@@ -159,25 +129,16 @@ document.addEventListener("DOMContentLoaded", function () {
     
     addTooltips();
 
-    // ================================================
-    // 6. ACTUALIZACIÓN AUTOMÁTICA (OPCIONAL)
-    // ================================================
-    // Si quieres que el dashboard se actualice automáticamente cada X minutos
-    const enableAutoRefresh = false; // Cambiar a true para activar
-    const refreshInterval = 5 * 60 * 1000; // 5 minutos
+    const enableAutoRefresh = false; 
+    const refreshInterval = 5 * 60 * 1000; 
     
     if (enableAutoRefresh) {
         setInterval(() => {
             console.log("Actualizando dashboard...");
-            // Aquí puedes hacer una petición AJAX para actualizar los datos
-            // sin recargar la página completa
-            // location.reload(); // Opción simple: recargar toda la página
+           
         }, refreshInterval);
     }
 
-    // ================================================
-    // 7. BÚSQUEDA RÁPIDA EN BLOQUES (OPCIONAL)
-    // ================================================
     const addSearchFunctionality = () => {
         const searchInput = document.querySelector("#dashboard-search");
         
@@ -201,12 +162,7 @@ document.addEventListener("DOMContentLoaded", function () {
     };
     
     addSearchFunctionality();
-
-    // ================================================
-    // 8. NOTIFICACIONES/ALERTAS
-    // ================================================
     const checkAlerts = () => {
-        // Ejemplo: verificar si hay animales con eventos pendientes
         const pendientesElement = document.querySelector("#inseminaciones .block-content p:last-of-type");
         
         if (pendientesElement) {
@@ -214,26 +170,19 @@ document.addEventListener("DOMContentLoaded", function () {
             const numberMatch = text.match(/\d+/);
             
             if (numberMatch && parseInt(numberMatch[0]) > 0) {
-                // Mostrar una notificación
                 showNotification("Tienes inseminaciones pendientes de confirmar", "warning");
             }
         }
     };
     
-    // Función auxiliar para mostrar notificaciones
     function showNotification(message, type = "info") {
-        // Esta función se integra con el sistema de toast existente
         if (typeof showToast === "function") {
             showToast(message, type);
         }
     }
     
-    // Verificar alertas al cargar
     setTimeout(checkAlerts, 2000);
 
-    // ================================================
-    // 9. IMPRIMIR REPORTE
-    // ================================================
     const addPrintButton = () => {
         const printBtn = document.querySelector("#print-dashboard");
         
@@ -246,25 +195,16 @@ document.addEventListener("DOMContentLoaded", function () {
     
     addPrintButton();
 
-    // ================================================
-    // 10. LOG DE ACTIVIDAD (DESARROLLO)
-    // ================================================
     console.log("Dashboard cargado correctamente");
     console.log("Bloques inicializados:", toggleButtons.length);
     console.log("Contadores animados:", counterElements.length);
 
 });
 
-// ================================================
-// FUNCIONES GLOBALES AUXILIARES
-// ================================================
-
-// Función para formatear números
 function formatNumber(num) {
     return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 }
 
-// Función para actualizar un contador específico
 function updateCounter(elementId, newValue) {
     const element = document.querySelector(elementId);
     if (element) {
@@ -272,7 +212,6 @@ function updateCounter(elementId, newValue) {
     }
 }
 
-// Exportar funciones si se necesita usar en otros scripts
 window.dashboardUtils = {
     formatNumber,
     updateCounter

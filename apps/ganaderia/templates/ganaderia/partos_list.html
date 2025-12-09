@@ -5,7 +5,6 @@
 
     <h2>Registro de Partos</h2>
 
-    <!-- FILTRO -->
     <form method="get" class="form-inline mb-3">
 
         <input type="text"
@@ -22,19 +21,16 @@
             Limpiar
         </a>
 
-        <!-- BOTÓN REGISTRAR PARTO -->
         <a href="{% url 'ganaderia:registrar_parto' %}" class="btn btn-success ml-auto">
             <i class="fa fa-plus"></i> Registrar Parto
         </a>
 
-        <!-- BOTÓN EXCEL -->
         <a href="{% url 'ganaderia:partos_excel' %}" class="btn btn-success ml-2">
             Descargar Excel
         </a>
 
     </form>
 
-    <!-- TABLA -->
     <table class="table table-striped">
         <thead>
             <tr>
@@ -62,12 +58,10 @@
                 <td>{{ p.sexo }}</td>
                 <td>{{ p.peso }}</td>
                 <td>
-                    <!-- EDITAR -->
                     <a href="{% url 'ganaderia:editar_parto' p.id %}" class="text-primary">
                         <i class="fa fa-edit"></i>
                     </a>
 
-                 <!-- ELIMINAR con confirmación -->
                     <a href="{% url 'ganaderia:eliminar_parto' p.id %}"
                     class="text-danger ml-2"
                     onclick="return confirm('¿Seguro que deseas eliminar este parto?');">
@@ -80,7 +74,6 @@
 
     </table>
 
-    <!-- PAGINACIÓN -->
     <div>
         Página {{ partos.number }} de {{ partos.paginator.num_pages }}
     </div>

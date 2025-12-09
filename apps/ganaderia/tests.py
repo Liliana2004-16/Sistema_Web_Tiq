@@ -1,4 +1,3 @@
-# apps/ganaderia/tests.py
 from django.test import TestCase
 from django.utils import timezone
 from apps.finca.models import Finca

@@ -17,7 +17,7 @@ class AnimalService:
             fecha=fecha,
             peso=peso,
             finca=finca,
-            animal=animal   # ✅ obligatorio
+            animal=animal   
         )
         pesaje.save()
         return pesaje
@@ -35,11 +35,9 @@ class AnimalService:
         if not madre.can_register_parto():
             raise Exception("No se puede registrar parto para esta hembra.")
 
-        # validar arete duplicado
         if Animal.objects.filter(numero_arete=numero_arete_cria).exists():
             raise Exception("Ya existe un animal registrado con ese número de arete.")
 
-        # Crear la cría
         cria = Animal.objects.create(
             numero_arete=numero_arete_cria,
             nombre=nombre_cria,
@@ -51,7 +49,6 @@ class AnimalService:
             finca=finca
         )
 
-        # Registrar el parto
         parto = Parto.objects.create(
             fecha_nacimiento=fecha_nac,
             madre=madre,
@@ -92,7 +89,6 @@ class AnimalService:
             traslado = Traslado(finca_origen=animal.finca, finca_destino=finca_destino, animal=animal, usuario=usuario)
             traslado.full_clean()
             traslado.save()
-            # actualizar animal
             animal.finca = finca_destino
             animal.estado = 'trasladado'
             animal.save(update_fields=['finca', 'estado'])

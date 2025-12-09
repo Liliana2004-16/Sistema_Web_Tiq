@@ -1,4 +1,3 @@
-# apps/ganaderia/apps.py
 from django.apps import AppConfig
 
 class GanaderiaConfig(AppConfig):
@@ -6,5 +5,4 @@ class GanaderiaConfig(AppConfig):
     name = 'apps.ganaderia'
 
     def ready(self):
-        # importa señales
-        import apps.ganaderia.signals  # noqa
+        import apps.ganaderia.signals  

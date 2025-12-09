@@ -1,12 +1,11 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}Panel Principal - Agrotiquiza{% endblock %}
+{% block title %}Agrotiquiza{% endblock %}
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
 <style>
-    /* Estilos inline como respaldo por si el CSS no carga */
     .dashboard { max-width: 1400px; margin: 0 auto; padding: 20px; }
     .dashboard-img { width: 100%; height: 220px; object-fit: cover; border-radius: 12px; }
 </style>
@@ -16,7 +15,6 @@
 
 <div class="dashboard">
 
-    <!-- Encabezado con imágenes tipo carrusel -->
     <div class="row mb-4">
         <div class="col-md-4 mb-3 mb-md-0">
             <img src="{% static 'images/vaca1.jpg' %}" class="dashboard-img" alt="Ganado 1" onerror="this.style.display='none'">
@@ -28,8 +26,6 @@
             <img src="{% static 'images/vaca3.jpg' %}" class="dashboard-img" alt="Ganado 3" onerror="this.style.display='none'">
         </div>
     </div>
-
-    <!-- Indicadores principales -->
     <h3 class="mb-4 fw-bold text-center text-md-start">Bienvenido a Agrotiquiza</h3>
 
     <div class="row text-center mb-5">
@@ -56,12 +52,9 @@
         </div>
     </div>
 
-    <!-- BLOQUES COLORIDOS -->
     <h4 class="fw-bold mb-4">Resumen General de Operaciones</h4>
 
     <div class="row">
-
-        <!-- ESTADO DEL GANADO -->
         <div class="col-lg-4 col-md-6 mb-4">
             <div class="block-card blue">
                 <h6><i class="fas fa-cow me-2"></i>Estado del Ganado</h6>
@@ -79,8 +72,6 @@
                 </div>
             </div>
         </div>
-
-        <!-- GANADO POR FINCA -->
         <div class="col-lg-4 col-md-6 mb-4">
             <div class="block-card green">
                 <h6><i class="fas fa-home me-2"></i>Ganado por Finca</h6>
@@ -102,24 +93,21 @@
             </div>
         </div>
 
-        <!-- FINCAS REGISTRADAS -->
         <div class="col-lg-4 col-md-6 mb-4">
             <div class="block-card purple">
-                <h6><i class="fas fa-map-marker-alt me-2"></i>Fincas Registradas</h6>
+                <h6><i class="fas fa-map-marker-alt me-2"></i>Partos Registrados</h6>
                 <button class="toggle-btn" data-target="#fincasReg" aria-label="Expandir/Colapsar" type="button">▼</button>
 
                 <div id="fincasReg" class="block-content">
-                    <p><strong>Total:</strong> {{ total_fincas|default:0 }}</p>
                     <p><strong>Partos registrados:</strong> {{ total_partos|default:0 }}</p>
 
-                    <a href="{% url 'finca:list' %}" class="btn btn-light btn-sm w-100 mt-3">
+                    <a href="{% url 'ganaderia:partos_list' %}" class="btn btn-light btn-sm w-100 mt-3">
                         <i class="fas fa-arrow-right me-1"></i> Ver Más
                     </a>
                 </div>
             </div>
         </div>
 
-        <!-- PRODUCCIÓN DE LECHE -->
         <div class="col-lg-4 col-md-6 mb-4">
             <div class="block-card yellow">
                 <h6><i class="fas fa-wine-bottle me-2"></i>Producción de Leche</h6>
@@ -141,7 +129,6 @@
             </div>
         </div>
 
-        <!-- SALUD ANIMAL -->
         <div class="col-lg-4 col-md-6 mb-4">
             <div class="block-card red">
                 <h6><i class="fas fa-heartbeat me-2"></i>Eventos de Salud</h6>
@@ -163,7 +150,6 @@
             </div>
         </div>
 
-        <!-- INSEMINACIONES -->
         <div class="col-lg-4 col-md-6 mb-4">
             <div class="block-card aqua">
                 <h6><i class="fas fa-syringe me-2"></i>Inseminaciones</h6>
@@ -190,7 +176,6 @@
 {% block extra_js %}
 <script src="{% static 'js/dashboard.js' %}"></script>
 <script>
-    // Log para verificar que el JS se cargó
     console.log('Dashboard HTML cargado');
     console.log('Static URL:', '{% static "css/dashboard.css" %}');
 </script>

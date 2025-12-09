@@ -40,8 +40,6 @@
     </form>
 </div>
 
-
-<!-- FORMULARIO DE FILTRO -->
 <form method="GET" class="form-inline mb-3">
     <label class="mr-2">Filtrar por mes:</label>
 
@@ -62,7 +60,6 @@
     </a>
 </form>
 
-<!-- TABLA -->
 <table class="table table-striped">
     <thead>
         <tr>
@@ -70,7 +67,6 @@
             <th>Arete</th>
             <th>Nombre</th>
             <th>Peso (kg)</th>
-            <th>Finca</th>
             <th>Acciones</th>
         </tr>
     </thead>
@@ -83,12 +79,10 @@
             <td>{{ p.animal.nombre }}</td>
             <td>{{ p.peso }}</td>
             <td>
-                    <!-- EDITAR -->
                     <a href="{% url 'ganaderia:pesaje_edit' p.id %}" class="text-primary">
                         <i class="fa fa-edit"></i>
                     </a>
 
-                 <!-- ELIMINAR con confirmación -->
                     <a href="{% url 'ganaderia:pesaje_delete' p.id %}"
                     class="text-danger ml-2"
                     onclick="return confirm('¿Seguro que deseas eliminar este parto?');">
@@ -120,7 +114,6 @@ document.addEventListener("DOMContentLoaded", function() {
         formDiv.style.display = "none";
     });
 
-    // AUTOCOMPLETADO DEL ARETE
     const inputArete = document.querySelector("#id_numero_arete");
     const inputNombre = document.querySelector("#id_nombre_animal");
     const inputFinca  = document.querySelector("#id_finca");

@@ -8,10 +8,9 @@ class EventoSanitario(models.Model):
     fecha = models.DateField()
     diagnostico = models.CharField(max_length=255)
     tratamiento = models.TextField()
-    sintomas = models.TextField(blank=True, null=True)  # opcional: no está en el ERD
+    sintomas = models.TextField(blank=True, null=True)  
     responsable = models.CharField(max_length=255)
 
-    # finca eliminada → ya está en animal.finca
     animal = models.ForeignKey(Animal, on_delete=models.CASCADE)
 
     class Meta:

@@ -1,16 +1,18 @@
 {% extends "base_public.html" %}
 {% load static %}
 
-{% block title %}Iniciar Sesión | Agrotiq{% endblock %}
+{% block title %}Iniciar Sesión{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'users/css/login.css' %}">
+
+{% endblock %}
 
 {% block content %}
-
-<link rel="stylesheet" href="{% static 'users/css/login.css' %}">
 
 <div class="login-wrapper">
     <div class="login-card">
 
-        <!-- Encabezado verde con logo -->
         <div class="login-header">
             <div class="logo-container">
                 <img src="{% static 'users/imagenes/logo.png' %}" alt="Logo"class="login-logo" >
@@ -18,7 +20,6 @@
             <h3 class="brand-name">AGROTIQUIZA</h3>
         </div>
 
-        <!-- Contenido del formulario -->
         <div class="login-body">
 
             <h4 class="login-title">Iniciar Sesión</h4>
@@ -27,7 +28,6 @@
             <form method="POST" id="loginForm" novalidate>
                 {% csrf_token %}
 
-                <!-- Campo Cédula -->
                 <div class="form-group">
                     <label for="id_username" class="form-label">Cédula</label>
                     <input type="text" 
@@ -41,7 +41,6 @@
                     <div class="invalid-feedback">Solo se permiten números.</div>
                 </div>
 
-                <!-- Campo Contraseña -->
                 <div class="form-group">
                     <label for="id_password" class="form-label">Contraseña</label>
                     <input type="password" 
@@ -52,11 +51,9 @@
                            required>
                 </div>
 
-                <!-- Botón de ingreso -->
                 <button type="submit" class="btn-login">Ingresar</button>
             </form>
 
-            <!-- Enlace de recuperación -->
             <div class="recover-container">
                 <a href="{% url 'users:recover_password' %}" class="recover-link">
                     ¿Olvidó su contraseña?
@@ -65,15 +62,16 @@
 
         </div>
 
-        <!-- Footer -->
         <div class="login-footer">
             <small>Sistema Ganadero v1.0</small>
+        </div>
+        <div class="login-footer">
+            <small>© 2025 Sistema de Ganadería. Todos los derechos reservados.</small>
         </div>
 
     </div>
 </div>
 
-<!-- Manejo de mensajes de Django -->
 {% for message in messages %}
 <div class="django-message" data-type="{{ message.tags }}" style="display:none;">{{ message }}</div>
 {% endfor %}

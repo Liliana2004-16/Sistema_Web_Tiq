@@ -1,4 +1,3 @@
-# apps/ganaderia/signals.py
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from .models import EventoSalida, Parto
@@ -18,5 +17,4 @@ def actualizar_estado_animal_en_evento(sender, instance, created, **kwargs):
 @receiver(post_save, sender=Parto)
 def post_parto_crear(sender, instance, created, **kwargs):
     if created:
-        # la creación de la cría ya se realiza desde el service, pero aquí podrías notificar o actualizar contadores
         pass

@@ -1,4 +1,3 @@
-# apps/ganaderia/admin.py
 from django.contrib import admin
 from .models import Animal, Pesaje, Parto, ProduccionLeche, EventoSalida, Traslado
 

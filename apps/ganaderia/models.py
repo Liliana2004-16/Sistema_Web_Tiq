@@ -1,11 +1,8 @@
-# apps/ganaderia/models.py
 from django.db import models
 from django.core.exceptions import ValidationError
 from django.utils import timezone
 from django.urls import reverse
 
-# Importa Finca y User con paths reales de tu proyecto
-# Ajusta si tus apps tienen path distinto
 from apps.finca.models import Finca
 from apps.users.models import User
 
@@ -55,7 +52,6 @@ class Animal(models.Model):
         return f"{self.numero_arete} - {self.nombre or 'Sin nombre'}"
 
     def clean(self):
-        # Validaciones de negocio
         if self.madre and self.madre.id == self.id:
             raise ValidationError("Un animal no puede ser su propia madre.")
         if self.sexo not in ('M', 'F'):
@@ -78,13 +74,12 @@ class Animal(models.Model):
     def can_register_parto(self):
         return self.sexo == 'F' and self.estado == 'activo'
 
-# apps/ganaderia/models.py (append or new file)
 class Pesaje(models.Model):
     id = models.BigAutoField(primary_key=True)
     fecha = models.DateField()
     peso = models.FloatField()
     animal = models.ForeignKey(Animal, on_delete=models.CASCADE, related_name='pesajes')
-    finca = models.ForeignKey(Finca, on_delete=models.PROTECT, related_name='pesajes')  # redundancia útil
+    finca = models.ForeignKey(Finca, on_delete=models.PROTECT, related_name='pesajes')  
 
     class Meta:
         ordering = ['-fecha']
@@ -100,7 +95,7 @@ class Pesaje(models.Model):
         if self.animal.estado in ['muerto', 'vendido', 'inactivo']:
             raise ValidationError("No se puede registrar pesaje para un animal en estado final.")
         super().clean()
-# apps/ganaderia/models.py (append)
+
 class Parto(models.Model):
     id = models.BigAutoField(primary_key=True)
     fecha_nacimiento = models.DateField()
@@ -125,10 +120,8 @@ class Parto(models.Model):
     def clean(self):
         if self.madre.sexo != 'F':
             raise ValidationError("La madre debe ser hembra.")
-        # validar que la cria no tenga arete duplicado si cria proviene con numero_arete (se gestiona en servicio)
         super().clean()
 
-# apps/ganaderia/models.py (append)
 class ProduccionLeche(models.Model):
     id = models.BigAutoField(primary_key=True)
     fecha = models.DateField()
@@ -148,26 +141,18 @@ class ProduccionLeche(models.Model):
 
     def clean(self):
 
-    # 1. Evitar error cuando aún no se ha asignado animal
         if not self.animal_id:  
-        # No podemos validar sexo si aún no hay animal: solo salimos
             return
 
-    # 2. Validación: solo hembras producen leche
-    #   Ahora sí podemos acceder a self.animal con seguridad
         if self.animal.sexo != 'F':
             raise ValidationError("Solo hembras pueden registrar producción de leche.")
 
-    # 3. Validación de pesos >= 0
         if (self.peso_am is not None and self.peso_am < 0) or \
             (self.peso_pm is not None and self.peso_pm < 0):
             raise ValidationError("Los valores de peso deben ser >= 0.")
 
         return super().clean()
 
-
-
-# apps/ganaderia/models.py (append)
 class EventoSalida(models.Model):
     TIPO_CHOICES = [('venta', 'Venta'), ('muerte', 'Muerte'), ('descarte','Descarte')]
     id = models.BigAutoField(primary_key=True)
@@ -184,25 +169,14 @@ class EventoSalida(models.Model):
 
     def clean(self):
         from django.core.exceptions import ValidationError
-
-        # 1. Evitar error cuando aún no se ha asignado un animal
         if not self.animal_id:
-            # Si prefieres que simplemente no valide en este punto:
             return
-        # O si quieres obligar a que haya un animal, usa:
-        # raise ValidationError("Debe seleccionar un animal antes de registrar el evento.")
-
-    # 2. Recuperar el animal de manera segura
         animal = self.animal
-
-    # 3. Validar estado del animal
         if animal.estado in ['vendido', 'muerto']:
             raise ValidationError("El animal ya tiene un evento de salida registrado.")
 
         super().clean()
 
-
-# apps/ganaderia/models.py (append)
 class Traslado(models.Model):
     id = models.BigAutoField(primary_key=True)
     fecha = models.DateTimeField(auto_now_add=True)

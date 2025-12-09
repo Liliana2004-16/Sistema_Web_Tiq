@@ -1,4 +1,3 @@
-# apps/ganaderia/forms.py
 from django import forms
 from .models import Pesaje, Parto, ProduccionLeche, EventoSalida, Animal, Traslado
 from apps.finca.models import Finca
@@ -132,11 +131,9 @@ class ProduccionForm(forms.ModelForm):
 
         numero = cleaned.get("numero_arete")
 
-    # Validación 1: campo vacío
         if not numero:
             raise forms.ValidationError("Debe ingresar un número de arete")
 
-    # Validación 2: buscar animal
         try:
             animal = Animal.objects.get(numero_arete=numero)
         except Animal.DoesNotExist:
@@ -144,7 +141,6 @@ class ProduccionForm(forms.ModelForm):
                 "El número de arete ingresado no corresponde a ningún animal registrado"
             )
 
-    # Asignar al cleaned_data (ESTO ES LO QUE FALTABA)
         cleaned["animal"] = animal
         cleaned["finca"] = animal.finca
 

@@ -1,4 +1,3 @@
-# apps/users/models.py
 from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.db import models
 from django.utils import timezone
@@ -47,16 +46,13 @@ class Rol(models.Model):
 
 
 class User(AbstractUser):
-    # quitamos username requerido; usamos cedula como identificador
     username = models.CharField(max_length=150, blank=True, null=True)
     cedula = models.CharField(max_length=20, unique=True)
    
     rol = models.ForeignKey(Rol, on_delete=models.SET_NULL, null=True)
     email = models.EmailField('Correo electrónico', unique=True)
     empresa = models.ForeignKey(Empresa, on_delete=models.SET_NULL, null=True, blank=True)
-    # control para recuperación: cuando se asigna contraseña temporal = True -> forzar cambio
     is_temp_password = models.BooleanField(default=False)
-    # quedamos con is_active (ya incluye bloqueo)
     date_joined = models.DateTimeField(default=timezone.now)
 
     USERNAME_FIELD = 'cedula'

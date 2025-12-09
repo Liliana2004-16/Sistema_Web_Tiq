@@ -16,7 +16,7 @@ class EventoSanitarioForm(forms.ModelForm):
 class InseminacionForm(forms.ModelForm):
     class Meta:
         model = Inseminacion
-        fields = ['fecha', 'tipo_semen', 'inseminador']  # quitar 'animal'
+        fields = ['fecha', 'tipo_semen', 'inseminador']  
         widgets = {
             'fecha': forms.DateInput(attrs={'type': 'date'}),
             'inseminador': forms.TextInput(attrs={'placeholder': 'Nombre del inseminador'}),

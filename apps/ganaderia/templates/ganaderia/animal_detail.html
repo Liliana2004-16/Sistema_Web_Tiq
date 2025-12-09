@@ -8,7 +8,6 @@
 {% block content %}
 <div class="container mt-4 mb-5">
   
-  <!-- Header del Animal -->
   <div class="animal-header">
     <div class="d-flex justify-content-between align-items-start">
       <div>
@@ -26,7 +25,6 @@
     </div>
   </div>
 
-  <!-- Estadísticas rápidas -->
   <div class="stats-row">
     <div class="stat-box">
       <span class="number">{{ animal.edad_dias|default:0 }}</span>
@@ -52,7 +50,6 @@
     </div>
   </div>
 
-  <!-- Información General -->
   <div class="info-card">
     <h5>Información General</h5>
     <div class="info-grid">
@@ -83,7 +80,6 @@
     </div>
   </div>
 
-  <!-- Últimos Pesajes -->
   <div class="info-card">
     <h5>Historial de Pesajes</h5>
     {% if animal.pesajes.all %}
@@ -117,7 +113,6 @@
     {% endif %}
   </div>
 
-  <!-- Historial de Partos (solo si es hembra) -->
   {% if animal.sexo == "F" or "emb" in animal.sexo|lower %}
   <div class="info-card">
     <h5>Historial de Partos</h5>
@@ -154,7 +149,6 @@
   </div>
   {% endif %}
 
-  <!-- Producción de Leche (solo si aplica) -->
   {% if animal.produccion_leche.all %}
   <div class="info-card">
     <h5>Producción de Leche</h5>
@@ -186,7 +180,6 @@
   </div>
   {% endif %}
 
-  <!-- Eventos de Salida -->
   {% if animal.eventos_salida.all %}
   <div class="info-card">
     <h5>Eventos de Salida</h5>
@@ -201,7 +194,6 @@
   </div>
   {% endif %}
 
-  <!-- Botón volver -->
   <div class="text-center mt-4">
     <a href="{% url 'ganaderia:animales_list' %}" class="btn-back">
       ← Volver al listado

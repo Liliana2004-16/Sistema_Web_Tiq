@@ -1,15 +1,8 @@
-// register.js
 
 document.addEventListener('DOMContentLoaded', function() {
     const form = document.getElementById('registerForm');
-    
-    // Agregar clases de Bootstrap a los campos del formulario
     addFormClasses();
-    
-    // Validación en tiempo real
     setupRealTimeValidation();
-    
-    // Validación al enviar el formulario
     form.addEventListener('submit', function(e) {
         if (!validateForm()) {
             e.preventDefault();
@@ -18,7 +11,6 @@ document.addEventListener('DOMContentLoaded', function() {
         form.classList.add('was-validated');
     });
     
-    // Auto-desaparecer alertas después de 5 segundos
     setTimeout(function() {
         const alerts = document.querySelectorAll('.alert');
         alerts.forEach(alert => {
@@ -28,9 +20,6 @@ document.addEventListener('DOMContentLoaded', function() {
     }, 5000);
 });
 
-/**
- * Agregar clases de Bootstrap a los campos del formulario
- */
 function addFormClasses() {
     const textInputs = document.querySelectorAll('input[type="text"], input[type="email"]');
     const selects = document.querySelectorAll('select');
@@ -38,7 +27,6 @@ function addFormClasses() {
     textInputs.forEach(input => {
         input.classList.add('form-control');
         
-        // Placeholder según el tipo de campo
         if (input.name.includes('cedula')) {
             input.setAttribute('placeholder', 'Ingrese número de cédula');
         } else if (input.name.includes('email')) {
@@ -53,7 +41,6 @@ function addFormClasses() {
     selects.forEach(select => {
         select.classList.add('form-select');
         
-        // Agregar opción por defecto si no existe
         if (select.options.length === 0 || select.options[0].value !== '') {
             const defaultOption = document.createElement('option');
             defaultOption.value = '';
@@ -63,15 +50,10 @@ function addFormClasses() {
     });
 }
 
-/**
- * Configurar validación en tiempo real
- */
 function setupRealTimeValidation() {
-    // Validación de cédula
     const cedulaInput = document.querySelector('input[name="cedula"]');
     if (cedulaInput) {
         cedulaInput.addEventListener('input', function(e) {
-            // Solo permitir números
             this.value = this.value.replace(/\D/g, '');
             
             if (this.value.length > 0 && this.value.length < 6) {
@@ -82,7 +64,6 @@ function setupRealTimeValidation() {
         });
     }
     
-    // Validación de email
     const emailInput = document.querySelector('input[name="email"]');
     if (emailInput) {
         emailInput.addEventListener('blur', function() {
@@ -95,7 +76,6 @@ function setupRealTimeValidation() {
         });
     }
     
-    // Validación de campos requeridos
     const requiredFields = document.querySelectorAll('[required]');
     requiredFields.forEach(field => {
         field.addEventListener('blur', function() {
@@ -115,27 +95,21 @@ function setupRealTimeValidation() {
     });
 }
 
-/**
- * Validar todo el formulario
- */
 function validateForm() {
     let isValid = true;
     
-    // Validar nombre
     const firstName = document.querySelector('input[name="first_name"]');
     if (firstName && !firstName.value.trim()) {
         showError(firstName, 'El nombre es requerido');
         isValid = false;
     }
-    
-    // Validar apellido
+
     const lastName = document.querySelector('input[name="last_name"]');
     if (lastName && !lastName.value.trim()) {
         showError(lastName, 'El apellido es requerido');
         isValid = false;
     }
     
-    // Validar cédula
     const cedula = document.querySelector('input[name="cedula"]');
     if (cedula) {
         if (!cedula.value.trim()) {
@@ -150,7 +124,6 @@ function validateForm() {
         }
     }
     
-    // Validar email
     const email = document.querySelector('input[name="email"]');
     if (email) {
         if (!email.value.trim()) {
@@ -162,7 +135,6 @@ function validateForm() {
         }
     }
     
-    // Validar rol
     const rol = document.querySelector('select[name="rol"]');
     if (rol && !rol.value) {
         showError(rol, 'Debe seleccionar un rol');
@@ -172,13 +144,10 @@ function validateForm() {
     return isValid;
 }
 
-/**
- * Mostrar mensaje de error en un campo
- */
+
 function showError(field, message) {
     field.classList.add('is-invalid');
     
-    // Buscar o crear div de error
     let errorDiv = field.nextElementSibling;
     if (!errorDiv || !errorDiv.classList.contains('invalid-feedback')) {
         errorDiv = document.createElement('div');
@@ -189,9 +158,6 @@ function showError(field, message) {
     errorDiv.textContent = message;
 }
 
-/**
- * Confirmar antes de cancelar si hay cambios
- */
 const cancelBtn = document.querySelector('a[href*="users_list"]');
 if (cancelBtn) {
     cancelBtn.addEventListener('click', function(e) {
@@ -214,9 +180,6 @@ if (cancelBtn) {
     });
 }
 
-/**
- * Mostrar indicador de carga al enviar
- */
 const submitBtn = document.querySelector('button[type="submit"]');
 if (submitBtn) {
     const form = document.getElementById('registerForm');

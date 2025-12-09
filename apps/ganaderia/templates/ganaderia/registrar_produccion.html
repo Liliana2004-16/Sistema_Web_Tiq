@@ -12,16 +12,12 @@
     <h2>Producción de Leche</h2>
     <p>Seleccione una opción:</p>
 
-    <!-- BOTONES PRINCIPALES -->
     <button class="btn btn-primary" onclick="mostrar('am')">Registro Mañana (AM)</button>
     <button class="btn btn-warning" onclick="mostrar('pm')">Registro Tarde (PM)</button>
     <button class="btn btn-success" onclick="mostrar('detalle')">Detalle de Registros</button>
 
     <hr>
 
-    <!-- ===========================
-        SECCIÓN: FORMULARIO AM
-    ============================ -->
     <div id="sec_am" class="section">
 
         <h4>Registro de Producción - Mañana (AM)</h4>
@@ -35,9 +31,6 @@
 
     </div>
 
-    <!-- ===========================
-        SECCIÓN: FORMULARIO PM
-    ============================ -->
     <div id="sec_pm" class="section">
 
         <h4>Registro de Producción - Tarde (PM)</h4>
@@ -51,9 +44,6 @@
 
     </div>
 
-    <!-- ===========================
-        SECCIÓN: DETALLE DE REGISTROS
-    ============================ -->
     <div id="sec_detalle" class="section">
 
         <h4>Detalle de Producción</h4>
@@ -109,12 +99,10 @@
 
 <script>
 function mostrar(seccion) {
-    // Ocultar todas las secciones
     document.querySelectorAll('.section').forEach(function (sec) {
         sec.style.display = 'none';
     });
 
-    // Mostrar la seleccionada
     if (seccion === 'am') document.getElementById('sec_am').style.display = 'block';
     if (seccion === 'pm') document.getElementById('sec_pm').style.display = 'block';
     if (seccion === 'detalle') document.getElementById('sec_detalle').style.display = 'block';

@@ -1,116 +1,66 @@
-/* ================================
-   AGROTIQUIZA – ESTILOS GLOBALES
-   Compatible con Bootstrap 5
-================================ */
-
-/* --- Colores base --- */
 :root {
-    --agro-primary: #2E7D32;
-    --agro-primary-light: #66BB6A;
-    --agro-secondary: #F9A825;
-    --agro-danger: #E53935;
-    --agro-gray: #F5F5F5;
-    --agro-text-gray: #616161;
+
+    --color-primary: #2c5530;
+    --color-primary-dark: #1a3a1d;
+    --color-primary-light: rgba(44, 85, 48, 0.8);
+    --color-bg-main: #f5f5f5;
+    --color-bg-sidebar: linear-gradient(180deg, #2c5530 0%, #1a3a1d 100%);
+    --color-overlay-light: rgba(255, 255, 255, 0.1);
+    --color-overlay-medium: rgba(255, 255, 255, 0.15);
+    --color-overlay-strong: rgba(255, 255, 255, 0.2);
+    --color-text-white: white;
+    --color-text-white-soft: rgba(255, 255, 255, 0.9);
+    --color-text-black: #000;
+    --color-success: #28a745;
+    --color-error: #dc3545;
+    --color-warning: #ffc107;
+    --color-info: #17a2b8;
+    --color-danger: rgba(220, 53, 69, 0.8);   
+    --spacing-xs: 10px;
+    --spacing-sm: 15px;
+    --spacing-md: 20px;
+    --spacing-lg: 30px;
+    --spacing-xl: 280px;   
+    --sidebar-width: 260px;
+    --sidebar-width-mobile: 100%;
+    --border-radius-sm: 6px;
+    --border-radius-md: 8px;
+    --border-radius-lg: 12px;
+
+    --toast-min-width: 250px;
+    
+
+    --font-family-main: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    --font-size-base: 14px;
+    --font-size-lg: 20px;
+    --font-weight-normal: 400;
+    --font-weight-medium: 500;
+    --font-weight-bold: 700;
+    
+    --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.1);
+    --shadow-md: 2px 0 10px rgba(0, 0, 0, 0.1);
+    --shadow-lg: 0 6px 20px rgba(0, 0, 0, 0.2);
+    
+    --transition-fast: 0.2s ease;
+    --transition-normal: 0.3s ease;
+    --transition-slow: 0.4s ease;
+    
+    --z-index-sidebar: 1000;
+    --z-index-toast: 3000;
+    
+
+    --height-full: 100vh;
+    --height-auto: auto;
+    
+
+    --border-divider: 2px solid rgba(255, 255, 255, 0.2);
 }
 
-/* --- Body general --- */
-body {
-    background-color: var(--agro-gray) !important;
-    font-family: "Segoe UI", Tahoma, sans-serif;
-    color: #333;
-}
 
-/* --- Navbar --- */
-.navbar {
-    background-color: var(--agro-primary) !important;
-}
-
-.navbar .nav-link,
-.navbar-brand {
-    color: #fff !important;
-    font-weight: 500;
-}
-
-.navbar .nav-link:hover {
-    color: var(--agro-secondary) !important;
-}
-
-.navbar .dropdown-menu {
-    border-radius: 8px;
-}
-
-/* --- Cards globales --- */
-.card {
-    border-radius: 10px !important;
-}
-
-.card-body h6 {
-    color: var(--agro-text-gray);
-}
-
-/* --- Tablas --- */
-.table thead {
-    background-color: var(--agro-primary-light) !important;
-    color: #fff;
-}
-
-.table-hover tbody tr:hover {
-    background-color: #e9f5ea;
-}
-
-/* --- Botones personalizados --- */
-.btn-success {
-    background-color: var(--agro-primary) !important;
-    border-color: var(--agro-primary) !important;
-}
-
-.btn-success:hover {
-    background-color: var(--agro-primary-light) !important;
-}
-
-.btn-warning {
-    background-color: var(--agro-secondary) !important;
-    border-color: var(--agro-secondary) !important;
-}
-
-.btn-danger {
-    background-color: var(--agro-danger) !important;
-}
-
-/* --- Inputs --- */
-.form-control:focus,
-.form-select:focus {
-    border-color: var(--agro-primary);
-    box-shadow: 0 0 0 0.15rem rgba(46, 125, 50, 0.25);
-}
-
-/* --- Badges personalizados --- */
-.badge.bg-success {
-    background-color: var(--agro-primary) !important;
-}
-
-.badge.bg-warning {
-    background-color: var(--agro-secondary) !important;
-}
-
-/* --- Custom alerts --- */
-.alert-success {
-    background-color: #d9f2dd !important;
-    color: var(--agro-primary) !important;
-    border-left: 5px solid var(--agro-primary);
-}
-
-.alert-danger {
-    border-left: 5px solid var(--agro-danger);
-}
-
-/* --- Tablas vacías --- */
-.empty-row {
-    color: var(--agro-text-gray);
-    font-style: italic;
-}
-
-/* --- Sombra suave global --- */
-.shadow-sm {
-    box-shadow: 0px 2px 8px rgba(0,0,0,0.08) !important;
+@media (max-width: 768px) {
+    :root {
+        --sidebar-width: var(--sidebar-width-mobile);
+        --spacing-xl: 0;
+        --spacing-md: 15px;
+    }
 }

@@ -163,15 +163,11 @@ def inseminacion_create(request):
     return render(request, "salud/inseminacion_form.html", {"form": form})
 
 
-
-# ---------- LISTAR ----------
 @login_required
 def inseminacion_list(request):
     registros = Inseminacion.objects.select_related("responsable").order_by('-fecha')
     return render(request, "salud/inseminacion_list.html", {"registros": registros})
 
-
-# ---------- EDITAR ----------
 @login_required
 @role_required("Gerente", "Administrador finca")
 def inseminacion_edit(request, pk):
@@ -187,8 +183,6 @@ def inseminacion_edit(request, pk):
 
     return render(request, "salud/inseminacion_form.html", {"form": form})
 
-
-# ---------- ELIMINAR ----------
 @login_required
 @role_required("Gerente", "Administrador finca")
 def inseminacion_delete(request, pk):
@@ -245,21 +239,30 @@ def confirmar_gestacion(request, id_inseminacion):
 def gestacion_historial(request):
 
     historial = ConfirmacionGestacion.objects.all()
-
-    # --- FILTROS ----
-    mes = request.GET.get("mes")
-    estado = request.GET.get("estado")
-    finca = request.GET.get("finca")  # si tus animales tienen campo finca
+    mes = request.GET.get("mes", "")
+    estado = request.GET.get("estado", "")
+    finca = request.GET.get("finca", "")
     
-    if mes:
-        historial = historial.filter(fecha_confirmacion__month=mes)
+    if mes and mes.strip():
+        try:
+            mes_int = int(mes)
+            historial = historial.filter(fecha_confirmacion__month=mes_int)
+        except ValueError:
+            mes = "" 
 
-    if estado:
+    if estado and estado.strip():
         historial = historial.filter(resultado=estado)
 
-    if finca:
+    if finca and finca.strip():
         historial = historial.filter(inseminacion__animal__finca_id=finca)
 
-    return render(request, "salud/gestacion_historial.html", {
-        "historial": historial
+    historial = historial.select_related(
+        'inseminacion__animal'
+    ).order_by('-fecha_confirmacion')
+
+    return render(request, "salud/historial_confirmaciones.html", {
+        "historial": historial,
+        "mes_seleccionado": mes,
+        "estado_seleccionado": estado,
+        "finca_seleccionada": finca,
     })

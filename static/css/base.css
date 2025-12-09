@@ -1,0 +1,181 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: var(--font-family-main);
+    background-color: var(--color-bg-main);
+}
+
+.sidebar {
+    width: var(--sidebar-width);
+    background: var(--color-bg-sidebar);
+    height: var(--height-full);
+    position: fixed;
+    top: 0;
+    left: 0;
+    padding: var(--spacing-md);
+    overflow-y: auto;
+    color: var(--color-text-white);
+    box-shadow: var(--shadow-md);
+    z-index: var(--z-index-sidebar);
+}
+
+.sidebar h3 {
+    color: var(--color-text-white);
+    margin-bottom: var(--spacing-lg);
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-bold);
+    text-align: center;
+    border-bottom: var(--border-divider);
+    padding-bottom: var(--spacing-sm);
+}
+
+.sidebar ul {
+    list-style: none;
+    padding: 0;
+}
+
+.sidebar ul li {
+    margin-bottom: var(--spacing-xs);
+}
+
+.sidebar details {
+    margin-bottom: var(--spacing-sm);
+}
+
+.sidebar summary {
+    cursor: pointer;
+    padding: 12px var(--spacing-sm);
+    background: var(--color-overlay-light);
+    border-radius: var(--border-radius-md);
+    font-weight: var(--font-weight-medium);
+    transition: all var(--transition-normal);
+    list-style: none;
+}
+
+.sidebar summary::-webkit-details-marker {
+    display: none;
+}
+
+.sidebar summary:hover {
+    background: var(--color-overlay-strong);
+}
+
+.sidebar details[open] summary {
+    background: var(--color-overlay-medium);
+    margin-bottom: var(--spacing-xs);
+}
+
+.sidebar details ul {
+    padding-left: var(--spacing-sm);
+}
+
+.sidebar details ul li a {
+    display: block;
+    padding: var(--spacing-xs) var(--spacing-sm);
+    color: var(--color-text-white-soft);
+    text-decoration: none;
+    border-radius: var(--border-radius-sm);
+    transition: all var(--transition-normal);
+    font-size: var(--font-size-base);
+}
+
+.sidebar details ul li a:hover {
+    background: var(--color-overlay-medium);
+    padding-left: var(--spacing-md);
+    color: var(--color-text-white);
+}
+
+.sidebar .nav-link {
+    display: block;
+    padding: 12px var(--spacing-sm);
+    background: var(--color-overlay-light);
+    border-radius: var(--border-radius-md);
+    text-decoration: none;
+    color: var(--color-text-white);
+    font-weight: var(--font-weight-medium);
+    transition: all var(--transition-normal);
+    margin-bottom: var(--spacing-sm);
+    text-align: center;
+}
+
+.sidebar .nav-link:hover {
+    background: var(--color-overlay-strong);
+}
+
+/* ========== CONTENIDO PRINCIPAL ========== */
+.content {
+    margin-left: var(--spacing-xl);
+    padding: var(--spacing-lg);
+    min-height: var(--height-full);
+}
+
+#toast-container {
+    position: fixed;
+    top: var(--spacing-md);
+    right: var(--spacing-md);
+    z-index: var(--z-index-toast);
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xs);
+}
+
+.toast {
+    min-width: var(--toast-min-width);
+    padding: 14px var(--spacing-md);
+    color: var(--color-text-white);
+    border-radius: var(--border-radius-md);
+    font-weight: var(--font-weight-medium);
+    box-shadow: var(--shadow-lg);
+    opacity: 0;
+    transform: translateX(100%);
+    animation: slide-in var(--transition-slow) forwards, 
+               fade-out 0.5s 3s forwards;
+}
+
+.toast-success { 
+    background: var(--color-success); 
+}
+
+.toast-error { 
+    background: var(--color-error); 
+}
+
+.toast-warning { 
+    background: var(--color-warning); 
+    color: var(--color-text-black); 
+}
+
+.toast-info { 
+    background: var(--color-info); 
+}
+
+@keyframes slide-in {
+    to { 
+        opacity: 1; 
+        transform: translateX(0); 
+    }
+}
+
+@keyframes fade-out {
+    to { 
+        opacity: 0; 
+        transform: translateX(100%); 
+    }
+}
+
+@media (max-width: 768px) {
+    .sidebar {
+        width: var(--sidebar-width-mobile);
+        height: var(--height-auto);
+        position: relative;
+    }
+    
+    .content {
+        margin-left: 0;
+        padding: var(--spacing-sm);
+    }
+}

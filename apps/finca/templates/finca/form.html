@@ -8,13 +8,12 @@
 {% block content %}
 <div class="container mt-4 mb-5">
   <div class="form-container">
-    
-    <!-- Header -->
+
+
     <div class="form-header">
       <h2>{{ titulo }}</h2>
     </div>
 
-    <!-- Formulario -->
     <div class="form-body">
       <form method="POST" novalidate>
         {% csrf_token %}
@@ -54,7 +53,6 @@
           </div>
         {% endfor %}
 
-        <!-- Botones de acción -->
         <div class="form-actions">
           <a href="{% url 'finca:list' %}" class="btn btn-secondary">
             ← Cancelar
@@ -72,7 +70,7 @@
 
 {% block extra_js %}
 <script>
-  // Auto-enfoque en el primer campo
+
   document.addEventListener('DOMContentLoaded', function() {
     const firstInput = document.querySelector('input:not([type="hidden"]), textarea, select');
     if (firstInput) {

@@ -1,4 +1,3 @@
-/* Reset y configuración general */
 * {
     margin: 0;
     padding: 0;
@@ -9,7 +8,7 @@ body {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
 }
 
-/* Contenedor principal - CENTRADO VERTICAL */
+
 .login-wrapper {
     min-height: 100vh;
     display: flex;
@@ -20,12 +19,11 @@ body {
     position: relative;
 }
 
-/* Tarjeta de login - CENTRADA */
 .login-card {
-    width: 350px;
-    max-width: 350px;
+    width: 380px;
+    max-width: 380px;
     background: white;
-    border-radius: 8px;
+    border-radius: 10px;
     overflow: hidden;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
 }
@@ -80,7 +78,6 @@ body {
     margin-bottom: 30px;
 }
 
-/* Grupos de formulario */
 .form-group {
     margin-bottom: 20px;
 }
@@ -114,7 +111,6 @@ body {
     color: #9ca3af;
 }
 
-/* Estados de validación */
 .form-control.is-invalid {
     border-color: #dc2626;
 }
@@ -130,7 +126,6 @@ body {
     display: block;
 }
 
-/* Botón de ingreso */
 .btn-login {
     width: 100%;
     padding: 13px;
@@ -186,6 +181,8 @@ body {
     color: #6b7280;
 }
 
+
+
 /* Responsive */
 @media (max-width: 480px) {
     .login-card {
@@ -203,13 +200,7 @@ body {
     .login-subtitle {
         font-size: 13px;
     }
+
+
 }
 
-/* Copyright footer externo */
-.copyright-footer {
-    text-align: center;
-    color: #6b7280;
-    font-size: 13px;
-    margin-top: 30px;
-    padding: 20px;
-}
