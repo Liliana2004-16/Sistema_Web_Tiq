@@ -1,19 +1,25 @@
-#!/usr/bin/env bash
 set -o errexit
 
+echo " Iniciando build..."
+
 # Instalar dependencias
+echo "Instalando dependencias..."
 pip install -r requirements.txt
 
 # Ejecutar migraciones
+echo "Ejecutando migraciones..."
 python manage.py migrate
 
 # Crear roles
+echo "Creando roles..."
 python manage.py seed_roles
 
 # Crear superusuario automáticamente
+echo "Creando superusuario..."
 python manage.py createadmin
 
 # Crear finca inicial si no existe
+echo "Verificando fincas..."
 python manage.py shell << 'EOF'
 from apps.finca.models import Finca
 
@@ -23,31 +29,25 @@ if Finca.objects.count() == 0:
         nombre="Finca Principal",
         ubicacion="Colombia"
     )
-    print("Finca creada exitosamente")
+    print(" Finca creada exitosamente")
 else:
-    print(f"ℹ  Ya existen {Finca.objects.count()} finca(s)")
+    print(f"ℹ Ya existen {Finca.objects.count()} finca(s)")
 EOF
 
-# Crear animales solo si no existen
-python manage.py shell << 'EOF'
-from apps.ganaderia.models import Animal
-from apps.finca.models import Finca
+# Verificar cantidad de animales y crear si es necesario
+echo "🐄 Verificando animales..."
+ANIMAL_COUNT=$(python manage.py shell -c "from apps.ganaderia.models import Animal; print(Animal.objects.count())")
 
-if Finca.objects.count() == 0:
-    print(" No hay fincas. No se pueden crear animales.")
-elif Animal.objects.count() == 0:
-    import subprocess
-    print(" Creando animales iniciales...")
-    result = subprocess.run(["python", "manage.py", "seed_animales", "--cantidad", "30"])
-    if result.returncode == 0:
-        print(" Animales creados exitosamente")
-    else:
-        print(" Hubo un problema creando los animales")
-else:
-    print(f" Ya existen {Animal.objects.count()} animales. Omitiendo seed.")
-EOF
+if [ "$ANIMAL_COUNT" -eq "0" ]; then
+    echo "✨ Creando animales iniciales..."
+    python manage.py seed_animales --cantidad 30
+    echo " Animales creados exitosamente"
+else
+    echo " Ya existen $ANIMAL_COUNT animales. Omitiendo seed."
+fi
 
 # Recolectar archivos estáticos
+echo " Recolectando archivos estáticos..."
 python manage.py collectstatic --noinput
 
 echo " Build completado exitosamente"
