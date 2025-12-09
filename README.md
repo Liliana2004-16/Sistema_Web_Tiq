@@ -36,7 +36,8 @@ Agrotiquiza/
 │   ├── ganaderia/                # Gestión de ganado, partos, traslados
 │   ├── inventario/               # Módulo de inventarios
 │   ├── usuarios/                 # Autenticación, perfiles, roles
-│   └── ...                       # Otras apps
+│   ├── salud/                    # Gestion de salud, Eventos sanitarios, inseminaciones
+│   ├── finca/                    # Gestion de fincas
 │
 ├── manage.py                     # Comando principal de Django
 └── requirements.txt              # Dependencias para instalación
