@@ -3,7 +3,6 @@
 
 Agrotiquiza es un sistema web diseñado para la administración integral de fincas ganaderas. Permite gestionar información del ganado, movimientos entre fincas, partos, inventarios, usuarios y reportes. Está construido con **Django**, siguiendo buenas prácticas, arquitectura modular y una estructura escalable.
 
----
 
 ## **Características principales**
 
@@ -18,7 +17,6 @@ Agrotiquiza es un sistema web diseñado para la administración integral de finc
 * Autenticación y manejo de sesiones
 * Notificaciones con mensajes (toasts)
 
----
 
 ##  **Arquitectura del Proyecto**
 
@@ -44,7 +42,6 @@ Agrotiquiza/
 └── requirements.txt              # Dependencias para instalación
 ```
 
----
 
 ## **Tecnologías utilizadas**
 
@@ -57,7 +54,6 @@ Agrotiquiza/
 | **OpenPyXL**     | Exportación de datos           |
 | **DotEnv**       | Manejo de variables de entorno |
 
----
 
 ## **Requerimientos**
 
@@ -74,7 +70,6 @@ sqlparse==0.5.3
 tzdata==2025.2
 ```
 
----
 
 ## **Instalación y configuración**
 
@@ -125,8 +120,6 @@ DB_HOST=localhost
 DB_PORT=3306
 ```
 
----
-
 ## **Migraciones**
 
 ```bash
@@ -134,7 +127,6 @@ python manage.py makemigrations
 python manage.py migrate
 ```
 
----
 
 ##  **Ejecutar el servidor**
 
@@ -142,18 +134,16 @@ python manage.py migrate
 python manage.py runserver
 ```
 
----
 
-## 🧪 **Usuarios principales (demo)**
+##  **Usuarios principales (demo)**
 
-| Rol           | Usuario  | Contraseña  |
-| ------------- | -------- | ----------- |
-| Administrador | admin    | admin123    |
-| Auxiliar      | auxiliar | auxiliar123 |
+| Rol                   | Usuario     | Contraseña  |
+| -------------         | --------    | ----------- |
+| Gerente               | 1002683179  | 1234        |
+| Adminitrador finca    | 6878989     | Mali432*    |
+| Auxiliar Adminitrtiva | auxiliar123 | Cami432*    |
 
-*(Modificar según tu proyecto real.)*
 
----
 
 ## **Módulos principales**
 
@@ -186,7 +176,6 @@ python manage.py runserver
 * Total de fincas
 * Estados de producción
 
----
 
 ## **Seguridad**
 
@@ -195,7 +184,6 @@ python manage.py runserver
 * Cambios de contraseña temporales
 * Validaciones personalizadas
 
----
 
 ## **Contribución**
 
@@ -208,11 +196,9 @@ python manage.py runserver
 3. Haz commit con mensajes claros
 4. Envía un Pull Request
 
----
-
 ##  **Licencia**
 
 Proyecto de uso privado para Agrotiquiza S.A.S.
 No se permite su distribución sin autorización.
 
----
+
